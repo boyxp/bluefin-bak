@@ -17,27 +17,27 @@ class _default implements \component\locator
 
 	public function get($name, array $params=null)
 	{
-		if(strpos($name, '\\')===false) {
-			$impl = 'default';
-		} else {
-			list($name, $impl) = explode('\\', $name);
+		if(is_null($params) and isset($this->_instance[$name])) {
+			return $this->_instance[$name];
 		}
 
-		if(is_null($params) and isset($this->_instance[$name.'_'.$impl])) {
-			return $this->_instance[$name.'_'.$impl];
-		}
-
-		$local_key = "LOCAL:{$name}_{$impl}";
-		$map = $this->_registry->get($local_key);
+		$local = "LOCAL:{$name}";
+		$map   = $this->_registry->get($local);
 		if(isset($map['classname']) and isset($map['construct']) and class_exists($map['classname'])) {
 			if($map['construct'] and !is_null($params)) {
 				$ref = new \ReflectionClass($map['classname']);
 				$instance = $ref->newInstanceArgs($params);
 			} else {
 				$instance = new $map['classname'];
-				$this->_instance[$name.'_'.$impl] = $instance;
+				$this->_instance[$name] = $instance;
 			}
 			return $instance;
+		}
+
+		if(strpos($name, '\\')===false) {
+			$impl = 'default';
+		} else {
+			list($name, $impl) = explode('\\', $name);
 		}
 
 		$map = $this->_registry->get($name);
@@ -52,10 +52,10 @@ class _default implements \component\locator
 						$instance = $ref->newInstanceArgs($params);
 					} else {
 						$instance = new $classname;
-						$this->_instance[$name.'_'.$impl] = $instance;
+						$this->_instance[$name.'\\'.$impl] = $instance;
 					}
 
-					$this->_registry->set($local_key, array('classname'=>$classname, 'construct'=>$construct), 86400);
+					$this->_registry->set($local, array('classname'=>$classname, 'construct'=>$construct), 86400);
 
 					return $instance;
 				}
@@ -72,18 +72,18 @@ class _default implements \component\locator
 
 	public function set($name, $instance)
 	{
-		if(strpos($name, '\\')===false) {
-			$impl = 'default';
-		} else {
-			list($name, $impl) = explode('\\', $name);
-		}
-
 		if(gettype($instance)==='object') {
+			if(strpos($name, '\\')===false) {
+				$impl = 'default';
+			} else {
+				list($name, $impl) = explode('\\', $name);
+			}
+
 			$map = $this->_registry->get($name);
 			if(isset($map['interface'])) {
 				$impls = class_implements($instance);
 				if(isset($impls[$map['interface']])) {
-					$this->_instance[$name.'_'.$impl] = $instance;
+					$this->_instance[$name.'\\'.$impl] = $instance;
 					return true;
 				}
 			} else {
