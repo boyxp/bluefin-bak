@@ -13,7 +13,7 @@ class _default implements \component\router,\component\injector
 		$_SERVER['SCRIPT_NAME'] = $_SERVER['QUERY_STRING'];
 
 		$this->_request  = self::$_locator->get('request');
-		$this->_registry = self::$_locator->get('registry', 'apc', array('rules'));
+		$this->_registry = self::$_locator->get('registry\apc', array('rules'));
 	}
 
 	public function get($rule, callable $handle)

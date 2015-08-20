@@ -15,8 +15,14 @@ class _default implements \component\locator
 		return $this->get($name);
 	}
 
-	public function get($name, $impl='default', array $params=null)
+	public function get($name, array $params=null)
 	{
+		if(strpos($name, '\\')===false) {
+			$impl = 'default';
+		} else {
+			list($name, $impl) = explode('\\', $name);
+		}
+
 		if(is_null($params) and isset($this->_instance[$name.'_'.$impl])) {
 			return $this->_instance[$name.'_'.$impl];
 		}
@@ -64,8 +70,14 @@ class _default implements \component\locator
 		return $this->set($name, $instance);
 	}
 
-	public function set($name, $instance, $impl='default')
+	public function set($name, $instance)
 	{
+		if(strpos($name, '\\')===false) {
+			$impl = 'default';
+		} else {
+			list($name, $impl) = explode('\\', $name);
+		}
+
 		if(gettype($instance)==='object') {
 			$map = $this->_registry->get($name);
 			if(isset($map['interface'])) {
