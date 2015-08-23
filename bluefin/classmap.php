@@ -37,4 +37,10 @@ $classmap
 		'default' => 'component\router\_default',
 	),
 ))
+->set('redis', array(
+	'interface' => 'library\redis',
+	'impls'     => array(
+		'default' => 'library\redis\_default',
+	),
+))
 ;
