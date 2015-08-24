@@ -5,44 +5,22 @@ class _default implements \component\router,\component\injector
 	private $_request  = null;
 	private $_registry = null;
 	private $_handle   = null;
-	private $_params   = array();
+	private $_matches  = array();
 	private static $_locator = null;
 
 	public function __construct()
 	{
-		$_SERVER['SCRIPT_NAME'] = $_SERVER['QUERY_STRING'];
-
-		$this->_request  = self::$_locator->get('request');
-		$this->_registry = self::$_locator->get('registry\apc', array('rules'));
+		$this->_request  = self::$_locator->request;
+		$this->_registry = self::$_locator->get('registry', array('rules'));
 	}
 
-	public function get($rule, callable $handle)
+	public function addRule($pattern, callable $handle)
 	{
-		return $this->_addRule('GET', $rule, $handle);
-	}
-
-	public function post($rule, callable $handle)
-	{
-		return $this->_addRule('POST', $rule, $handle);
-	}
-
-	public function put($rule, callable $handle)
-	{
-		return $this->_addRule('PUT', $rule, $handle);
-	}
-
-	public function delete($rule, callable $handle)
-	{
-		return $this->_addRule('DELETE', $rule, $handle);
-	}
-
-	private function _addRule($method, $rule, $handle)
-	{
-		if(strpos($rule, '*')===false) {
-			$this->_registry->set("STATIC:{$method}:{$rule}", $handle);
+		if(strpos($pattern, '*')===false) {
+			$this->_registry->set("STATIC:{$pattern}", $handle);
 		} else {
-			$nodes = explode('/', ltrim($rule, '/'));
-			$key   = "MATCH:{$method}:{$nodes[0]}";
+			$nodes = explode('/', ltrim($pattern, '/'));
+			$key   = "MATCH:{$nodes[0]}";
 			unset($nodes[0]);
 
 			$tree  = $this->_registry->exists($key) ? $this->_registry->get($key) : array();
@@ -62,32 +40,42 @@ class _default implements \component\router,\component\injector
 		return $this;
 	}
 
-	public function route($uri=null)
+	public function removeRule($pattern)
 	{
-		$method = $this->_request->method;
-		$uri    = $uri ? $uri : $this->_request->path.'/'.$this->_request->filename;
-		if($handle=$this->_registry->get("STATIC:{$method}:{$uri}")) {
+		return $this;
+	}
+
+	public function flushRule()
+	{
+		$this->_registry->flush();
+		return $this;
+	}
+
+	public function route($subject=null)
+	{
+		$subject = $subject ? $subject : "{$this->_request->method}:{$this->_request->uri}";
+		if($handle=$this->_registry->get("STATIC:{$subject}")) {
 			$this->_handle = $handle;
 			return true;
 		} else {
-			$nodes = explode('/', ltrim($uri, '/'));
-			$rules = $this->_registry->get("MATCH:{$method}:{$nodes[0]}");
+			$nodes = explode('/', ltrim($subject, '/'));
+			$rules = $this->_registry->get("MATCH:{$nodes[0]}");
 			if($rules) {
-				$last   = &$rules;
-				$matchs = array();
+				$last    = &$rules;
+				$matches = array();
 				for($i=1,$count=count($nodes),$end=$count-1;$i<$count;$i++) {
 					if(isset($last[$nodes[$i]])) {
 						$last = &$last[$nodes[$i]];
 					} elseif(isset($last['*']) and ctype_alnum($nodes[$i])) {
-						$matchs[] = $nodes[$i];
-						$last     = &$last['*'];
+						$matches[] = $nodes[$i];
+						$last      = &$last['*'];
 					} else {
 						return false;
 					}
 
 					if($i===$end and isset($last['@handle'])) {
 						$this->_handle = $last['@handle'];
-						$this->_params = $matchs;
+						$this->_matches= $matches;
 						return true;
 					}
 				}
@@ -102,9 +90,9 @@ class _default implements \component\router,\component\injector
 		return $this->_handle;
 	}
 
-	public function getParams()
+	public function getMatches()
 	{
-		return $this->_params;
+		return $this->_matches;
 	}
 
 	public static function inject(\component\locator $locator)
