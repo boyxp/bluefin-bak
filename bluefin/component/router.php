@@ -2,9 +2,10 @@
 namespace component;
 interface router
 {
-	public function addRule($method, $pattern, callable $handle);
-	public function removeRule($method, $pattern);
-	public function route(\component\request $request=null);
+	public function addRule($pattern, callable $handle);
+	public function removeRule($pattern);
+	public function flushRule();
+	public function route($subject=null);
 	public function getHandle();
-	public function getParams();
+	public function getMatches();
 }
