@@ -51,5 +51,6 @@ class apc implements \component\registry
 			}
 		}
 		$iterator = null;
+		return $this;
 	}
 }
