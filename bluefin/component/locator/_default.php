@@ -25,8 +25,9 @@ class _default implements \component\locator
 		$map   = $this->_registry->get($local);
 		if(isset($map['classname']) and isset($map['construct']) and class_exists($map['classname'])) {
 			if($map['construct'] and !is_null($params)) {
-				$ref = new \ReflectionClass($map['classname']);
-				$instance = $ref->newInstanceArgs($params);
+				$reflection = new \ReflectionClass($map['classname']);
+				$instance   = $reflection->newInstanceArgs($params);
+				$reflection = null;
 			} else {
 				$instance = new $map['classname'];
 				$this->_instance[$name] = $instance;
@@ -45,11 +46,12 @@ class _default implements \component\locator
 			$interface = $map['interface'];
 			$classname = $map['impls'][$impl];
 			if(class_exists($classname) and interface_exists($interface)) {
-				$ref = new \ReflectionClass($classname);
-				if($ref->implementsInterface($interface)) {
-					$construct = $ref->hasMethod('__construct');
+				$reflection = new \ReflectionClass($classname);
+				if($reflection->implementsInterface($interface)) {
+					$construct = $reflection->hasMethod('__construct');
 					if(!is_null($params) and $construct) {
-						$instance = $ref->newInstanceArgs($params);
+						$instance   = $reflection->newInstanceArgs($params);
+						$reflection = null;
 					} else {
 						$instance = new $classname;
 						$this->_instance[$name.'\\'.$impl] = $instance;
