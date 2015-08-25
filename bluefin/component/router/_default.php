@@ -53,7 +53,14 @@ class _default implements \component\router,\component\injector
 
 	public function route($subject=null)
 	{
-		$subject = $subject ? $subject : "{$this->_request->method}:{$this->_request->uri}";
+		if(is_null($subject)) {
+			if(($pos=strrpos($this->_request->uri, '.'))!==false) {
+				$subject = $this->_request->method.':'.substr($this->_request->uri, 0, $pos);
+			} else {
+				$subject = $this->_request->method.':'.$this->_request->uri;
+			}
+		}
+
 		if($handle=$this->_registry->get("STATIC:{$subject}")) {
 			$this->_handle = $handle;
 			return true;
