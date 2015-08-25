@@ -2,7 +2,6 @@
 namespace component;
 interface registry
 {
-	public function __construct($prefix=null);
 	public function get($key);
 	public function __get($key);
 	public function set($key, $value, $ttl=0);
