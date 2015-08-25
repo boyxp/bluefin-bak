@@ -6,7 +6,7 @@ class _default implements \component\request
 
 	public function __construct()
 	{
-		$this->_pathinfo = pathinfo($_SERVER['SCRIPT_NAME']);
+		$this->_pathinfo = pathinfo($_SERVER['REQUEST_URI']);
 	}
 
 	public function getMethod()
