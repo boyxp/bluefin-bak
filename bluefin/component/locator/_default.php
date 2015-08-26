@@ -17,14 +17,14 @@ class _default implements \component\locator
 
 	public function get($name, array $params=null)
 	{
-		if(is_null($params) and isset($this->_instance[$name])) {
+		if($params===null and isset($this->_instance[$name])) {
 			return $this->_instance[$name];
 		}
 
 		$local = "LOCAL:{$name}";
 		$map   = $this->_registry->get($local);
 		if(isset($map['classname']) and isset($map['construct']) and class_exists($map['classname'])) {
-			if($map['construct'] and !is_null($params)) {
+			if($map['construct'] and $params!==null) {
 				$reflection = new \ReflectionClass($map['classname']);
 				$instance   = $reflection->newInstanceArgs($params);
 				$reflection = null;
@@ -49,7 +49,7 @@ class _default implements \component\locator
 				$reflection = new \ReflectionClass($classname);
 				if($reflection->implementsInterface($interface)) {
 					$construct = $reflection->hasMethod('__construct');
-					if(!is_null($params) and $construct) {
+					if($params!==null and $construct) {
 						$instance   = $reflection->newInstanceArgs($params);
 						$reflection = null;
 					} else {
