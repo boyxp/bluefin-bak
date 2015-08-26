@@ -6,7 +6,7 @@ class apc implements \component\registry
 
 	public function __construct($prefix=null)
 	{
-		if(!is_null($prefix) and is_string($prefix)) {
+		if($prefix!==null and is_string($prefix)) {
 			$this->_prefix = $prefix.':';
 		}
 	}
