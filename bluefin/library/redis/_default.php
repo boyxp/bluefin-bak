@@ -41,6 +41,21 @@ class _default implements \library\redis
 		return $this->_response();
 	}
 
+	public function begin()
+	{
+		$this->multi();
+	}
+
+	public function commit()
+	{
+		$this->exec();
+	}
+
+	public function rollback()
+	{
+		$this->discard();
+	}
+
 	private function _response()
 	{
 		$res  = fgets($this->_socket);
