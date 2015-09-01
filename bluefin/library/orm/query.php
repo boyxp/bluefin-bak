@@ -2,7 +2,7 @@
 namespace library\orm;
 interface query
 {
-	public function columns($columns='*');
+	public function select($columns='*');
 	public function from();
 	public function where($condition, array $bind=null);
 	public function group($fields);
