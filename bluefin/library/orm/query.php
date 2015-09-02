@@ -10,4 +10,5 @@ interface query
 	public function order($field, $direction='ASC');
 	public function limit($count=20, $offset=0);
 	public function fetch($all=true);
+	public function condition($condition, array $bind=null);
 }
