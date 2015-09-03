@@ -9,6 +9,5 @@ interface query
 	public function having($condition, array $bind=null);
 	public function order($field, $direction='ASC');
 	public function limit($count=20, $offset=0);
-	public function fetch($all=true);
-	public function condition($condition, array $bind=null);
+	public function fetch($resultset=false);
 }
