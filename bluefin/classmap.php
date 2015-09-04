@@ -43,4 +43,10 @@ $classmap
 		'default' => 'library\redis\_default',
 	),
 ))
+->set('connection', array(
+	'interface' => 'library\orm\connection',
+	'impls'     => array(
+		'default' => 'library\orm\connection\pdo',
+	),
+))
 ;
