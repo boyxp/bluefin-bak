@@ -49,4 +49,10 @@ $classmap
 		'default' => 'library\orm\connection\pdo',
 	),
 ))
+->set('resultset', array(
+	'interface' => 'library\orm\resultset',
+	'impls'     => array(
+		'default' => 'library\orm\resultset\_default',
+	),
+))
 ;
