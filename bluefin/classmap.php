@@ -55,4 +55,10 @@ $classmap
 		'default' => 'library\orm\resultset\_default',
 	),
 ))
+->set('record', array(
+	'interface' => 'library\orm\record',
+	'impls'     => array(
+		'default' => 'library\orm\record\_default',
+	),
+))
 ;
