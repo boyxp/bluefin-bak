@@ -7,7 +7,7 @@ class pdo extends \PDO implements \library\orm\connection
 		try {
 			parent::__construct($dsn, $user, $password);
 		} catch (exception $e) {
-			throw new exception('Connection failed: '.$e->getMessage(), $e->getCode());
+			throw new \exception('Connection failed: '.$e->getMessage(), $e->getCode());
 		}
 
 		//attribute
