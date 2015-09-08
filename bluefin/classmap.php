@@ -47,6 +47,7 @@ $classmap
 	'interface' => 'library\orm\connection',
 	'impls'     => array(
 		'default' => 'library\orm\connection\pdo',
+		'pdo'     => 'library\orm\connection\pdo',
 	),
 ))
 ->set('resultset', array(
@@ -59,6 +60,13 @@ $classmap
 	'interface' => 'library\orm\record',
 	'impls'     => array(
 		'default' => 'library\orm\record\_default',
+	),
+))
+->set('query', array(
+	'interface' => 'library\orm\query',
+	'impls'     => array(
+		'default' => 'library\orm\query\pdo',
+		'pdo'     => 'library\orm\query\pdo',
 	),
 ))
 ;
