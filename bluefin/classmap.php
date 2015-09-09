@@ -69,4 +69,11 @@ $classmap
 		'pdo'     => 'library\orm\query\pdo',
 	),
 ))
+->set('table', array(
+	'interface' => 'library\orm\table',
+	'impls'     => array(
+		'default' => 'library\orm\table\pdo',
+		'pdo'     => 'library\orm\table\pdo',
+	),
+))
 ;
