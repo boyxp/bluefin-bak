@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\query;
-class pdo implements \library\orm\query
+class pdo implements \library\orm\query,\component\injector
 {
 	private $connection= null;
 	private $table     = null;
@@ -117,5 +117,10 @@ class pdo implements \library\orm\query
 		return "SELECT {$this->columns} FROM {$this->table} WHERE {$this->condition} {$this->group} {$this->having}"
 			.(isset($this->order[0]) ? " ORDER BY ".implode(',', $this->order) : "")
 			." LIMIT {$this->offset},{$this->count}";
+	}
+
+	public static function inject(\component\locator $locator)
+	{
+		static::$_locator = $locator;
 	}
 }
