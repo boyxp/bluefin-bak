@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\resultset;
-class _default implements \library\orm\resultset
+class _default implements \library\orm\resultset,\component\injector
 {
 	private $data    = null;
 	private $positon = 0;
@@ -137,5 +137,10 @@ class _default implements \library\orm\resultset
 	public function offsetGet($offset)
 	{
 		return isset($this->data[$offset]) ? $this->data[$offset] : null;
+	}
+
+	public static function inject(\component\locator $locator)
+	{
+		static::$_locator = $locator;
 	}
 }
