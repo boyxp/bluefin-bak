@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\table;
-class pdo implements \library\orm\table
+class pdo implements \library\orm\table,\component\injector
 {
 	const DB    = 'test';
 	const TABLE = 'test';
@@ -24,5 +24,10 @@ class pdo implements \library\orm\table
 
 	public static function getConnection()
 	{
+	}
+
+	public static function inject(\component\locator $locator)
+	{
+		static::$_locator = $locator;
 	}
 }
