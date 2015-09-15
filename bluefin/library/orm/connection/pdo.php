@@ -5,7 +5,7 @@ class pdo extends \PDO implements \library\orm\connection
 	public function __construct($dsn, $user, $password, array $options=null)
 	{
 		try {
-			parent::__construct($dsn, $user, $password);
+			parent::__construct($dsn, $user, $password, array(PDO::ATTR_PERSISTENT => true));
 		} catch (exception $e) {
 			throw new \exception('Connection failed: '.$e->getMessage(), $e->getCode());
 		}
