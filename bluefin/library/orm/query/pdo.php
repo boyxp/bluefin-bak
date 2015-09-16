@@ -103,11 +103,10 @@ class pdo implements \library\orm\query,\component\injector
 		$this->offset   = 0;
 		$this->state    = 0;
 
+		$result = $smth->fetchAll(PDO::FETCH_ASSOC);
 		if(!$all) {
-			$result = $smth->fetch(PDO::FETCH_ASSOC);
-			return $result===false ? null : $result;//==new record
+			return !isset($result[0]) ? null : $result[0];//==new record
 		} else {
-			$result = $smth->fetchAll(PDO::FETCH_ASSOC);
 			return !isset($result[0]) ? null : $result;//==new resultset
 		}
 	}
