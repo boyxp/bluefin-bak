@@ -5,6 +5,8 @@ class _default implements \library\orm\resultset,\component\injector
 	private $data    = null;
 	private $positon = 0;
 
+	private static $_locator = null;
+
 	public function __construct(array $data=array())
 	{
 		$this->data = $data;
