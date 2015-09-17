@@ -14,6 +14,8 @@ class pdo implements \library\orm\query,\component\injector
 	private $offset    = 0;
 	private $state     = 0;
 
+	private static $_locator = null;
+
 	public function __construct($connection=null, $table=null)
 	{
 		$this->connection = $connection;
