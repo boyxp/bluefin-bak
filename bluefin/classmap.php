@@ -76,4 +76,10 @@ $classmap
 		'pdo'     => 'library\orm\table\pdo',
 	),
 ))
+->set('pool', array(
+	'interface' => 'library\orm\pool',
+	'impls'     => array(
+		'default' => 'library\orm\pool\_default',
+	),
+))
 ;
