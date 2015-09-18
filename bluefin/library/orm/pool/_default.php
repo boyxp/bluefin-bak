@@ -3,6 +3,7 @@ namespace library\orm\pool;
 class _default implements \library\orm\pool,\component\injector
 {
 	private static $connection = array();
+	private static $singleton  = array();
 	private static $_locator   = null;
 
 	public static function addConnection($db, \library\orm\connection $connection, $master=true)
@@ -14,9 +15,15 @@ class _default implements \library\orm\pool,\component\injector
 	public static function getConnection($db, $master=true)
 	{
 		$type = $master ? 'master' : 'slave';
+
+		if(isset(static::$singleton[$db][$type])) {
+			return static::$singleton[$db][$type];
+		}
+
 		if(isset(static::$connection[$db][$type])) {
 			$index = array_rand(static::$connection[$db][$type]);
-			return static::$connection[$db][$type][$index];
+			static::$singleton[$db][$type] = static::$connection[$db][$type][$index];
+			return static::$singleton[$db][$type];
 		}
 
 		return null;
@@ -48,5 +55,11 @@ class _default implements \library\orm\pool,\component\injector
 	public static function inject(\component\locator $locator)
 	{
 		static::$_locator = $locator;
+	}
+
+	public function __destruct()
+	{
+		static::$connection = null;
+		static::$singleton  = null;
 	}
 }
