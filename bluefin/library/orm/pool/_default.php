@@ -2,54 +2,55 @@
 namespace library\orm\pool;
 class _default implements \library\orm\pool,\component\injector
 {
-	private static $connection = array();
-	private static $singleton  = array();
-	private static $_locator   = null;
+	private static $_connection = array();
+	private static $_singleton  = array();
+	private static $_locator    = null;
 
-	public static function addConnection($db, \library\orm\connection $connection, $master=true)
+	public function addConnection($db, \library\orm\connection $connection, $master=true)
 	{
 		$type = $master ? 'master' : 'slave';
-		static::$connection[$db][$type][] = $connection;
+		static::$_connection[$db][$type][] = $connection;
 	}
 
-	public static function getConnection($db, $master=true)
+	public function getConnection($db, $master=true)
 	{
 		$type = $master ? 'master' : 'slave';
 
-		if(isset(static::$singleton[$db][$type])) {
-			return static::$singleton[$db][$type];
+		if(isset(static::$_singleton[$db][$type])) {
+			return static::$_singleton[$db][$type];
 		}
 
-		if(isset(static::$connection[$db][$type])) {
-			$index = array_rand(static::$connection[$db][$type]);
-			static::$singleton[$db][$type] = static::$connection[$db][$type][$index];
-			return static::$singleton[$db][$type];
+		if(isset(static::$_connection[$db][$type])) {
+			$index = array_rand(static::$_connection[$db][$type]);
+			static::$_singleton[$db][$type] = static::$_connection[$db][$type][$index];
+			return static::$_singleton[$db][$type];
 		}
 
 		return null;
 	}
 
-	public static function removeConnection($db, $master=true)
+	public function removeConnection($db, $master=true)
 	{
 		$type = $master ? 'master' : 'slave';
-		if(isset(static::$connection[$db][$type])) {
-			unset(static::$connection[$db][$type]);
+
+		if(isset(static::$_connection[$db][$type])) {
+			unset(static::$_connection[$db][$type]);
 		}
 	}
 
-	public static function flushConnection()
+	public function flushConnection()
 	{
-		static::$connection = array();
+		static::$_connection = array();
 	}
 
 	public function __get($db)
 	{
-		return static::getConnection($db);
+		return $this->getConnection($db);
 	}
 
 	public function __set($db, \library\orm\connection $connection)
 	{
-		static::addConnection($db, $connection);
+		$this->addConnection($db, $connection);
 	}
 
 	public static function inject(\component\locator $locator)
@@ -59,7 +60,7 @@ class _default implements \library\orm\pool,\component\injector
 
 	public function __destruct()
 	{
-		static::$connection = null;
-		static::$singleton  = null;
+		static::$_connection = null;
+		static::$_singleton  = null;
 	}
 }
