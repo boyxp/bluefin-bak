@@ -6,7 +6,7 @@ class pdo implements \library\orm\table,\component\injector
 	const TABLE = 'test';
 	const KEY   = 'id';
 
-	protected static $_query   = array();
+	protected static $_query  = array();
 	protected static $_locator = null;
 
 	public static function insert(array $data=null, $multi=false)

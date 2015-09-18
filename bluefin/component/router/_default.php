@@ -9,7 +9,7 @@ class _default implements \component\router,\component\injector
 
 	public function __construct()
 	{
-		$this->_registry = self::$_locator->get('registry', array('rules'));
+		$this->_registry = static::$_locator->get('registry', array('rules'));
 	}
 
 	public function addRule($pattern, callable $handle)
@@ -52,7 +52,7 @@ class _default implements \component\router,\component\injector
 	public function route($subject=null)
 	{
 		if($subject===null) {
-			$request = self::$_locator->request;
+			$request = static::$_locator->request;
 			if(($pos=strrpos($request->uri, '.'))!==false) {
 				$subject = $request->method.':'.substr($request->uri, 0, $pos);
 			} else {
