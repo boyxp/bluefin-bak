@@ -39,14 +39,27 @@ class pdo implements \library\orm\table,\component\injector
 
 	public static function update(array $data, $condition=null, array $bind=null)
 	{
+		$fields     = array_keys($data);
+		$where      = static::_condition($condition, $bind);
+		$bind       = $where['bind'] ? array_merge(array_values($data), $where['bind']) : array_values($data);
+		$connection = static::$_locator->pool->getConnection(static::DB, $master=true);
+		$statement  = $connection->prepare('UPDATE '.static::TABLE.' SET `'.join($fields, '`=?,`').'`=? WHERE '.$where['condition']);
+		$statement->execute($bind);
+		return $statement->rowCount();
 	}
 
 	public static function delete($condition=null, array $bind=null)
 	{
+		$where      = static::_condition($condition, $bind);
+		$connection = static::$_locator->pool->getConnection(static::DB, $master=true);
+		$statement  = $connection->prepare('DELETE FROM '.static::TABLE.' WHERE '.$where['condition']);
+		$statement->execute($where['bind']);
+		return $statement->rowCount();
 	}
 
 	public static function getConnection()
 	{
+		return static::$_locator->pool->getConnection(static::DB, $master=true);
 	}
 
 	protected static function _getQueryInstance()
@@ -57,6 +70,46 @@ class pdo implements \library\orm\table,\component\injector
 		}
 
 		return static::$_query[$key];
+	}
+
+	protected static function _condition($condition, array $bind=null)
+	{
+		switch(gettype($condition))
+		{
+			case 'string' :
+					if(!ctype_digit($condition)) {
+						if(strpos($condition, '(?)')!==false and is_array($bind)) {
+							$condition= str_replace('(?)', '(%s)', $condition);
+							$temp     = array();
+							$holders  = array();
+							foreach($bind as $param) {
+								if(is_array($param)) {
+									$holders[] = '?'.str_repeat(',?', count($param)-1);
+									$temp      = array_merge($temp, $param);
+								} else {
+									$temp[] = $param;
+								}
+							}
+
+							$bind      = $temp;
+							$condition = vsprintf($condition, $holders);
+						}
+						break;
+					}
+			case 'integer':
+					$bind      = array(intval($condition));
+					$condition = static::KEY.'=?';
+					break;
+			case 'array'  :
+					$bind      = $condition;
+					$condition = static::KEY.' IN(?'.str_repeat(',?', count($bind)-1).')';
+					break;
+			default      :
+					throw new exception('syntax error');
+			break;
+		}
+
+		return array('condition'=>$condition, 'bind'=>$bind);
 	}
 
 	public static function inject(\component\locator $locator)
