@@ -11,6 +11,26 @@ class pdo implements \library\orm\table,\component\injector
 
 	public static function insert(array $data=null, $multi=false)
 	{
+		$fields     = $multi ? array_keys(current($data)) : array_keys($data);
+		$connection = static::$_locator->pool->getConnection(static::DB, $master=true);
+		$statement  = $connection->prepare('INSERT INTO '.static::TABLE.'(`'.join($fields, '`,`').'`)VALUES(?'.str_repeat(',?', count($fields)-1).')');
+
+		if($multi) {
+			$connection->begin();
+			try {
+				foreach($data as $row) {
+					$statement->execute(array_values($row));
+				}
+				$connection->commit();
+				return count($data);
+			} catch(exception $e) {
+				$connection->rollback();
+				return 0;
+			}
+		} else {
+			$statement->execute(array_values($data));
+			return $connection->lastInsertId();
+		}
 	}
 
 	public static function select($columns='*', $condition=null, array $bind=null)
