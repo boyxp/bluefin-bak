@@ -41,8 +41,11 @@ class pdo implements \library\orm\table,\component\injector
 				static::$_query[$key]= static::$_locator->get('query\pdo', array(static::DB, static::TABLE));
 			}
 
-			$condition = $condition===null ? 1 : $condition;
-			return static::$_query[$key]->select($columns)->where($condition, $bind);
+			if($condition===null) {
+				return static::$_query[$key]->select($columns);
+			} else {
+				return static::$_query[$key]->select($columns)->where($condition, $bind);
+			}
 		}
 
 		$where     = static::_condition($columns);
