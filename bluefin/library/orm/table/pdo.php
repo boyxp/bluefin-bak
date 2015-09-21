@@ -35,6 +35,29 @@ class pdo implements \library\orm\table,\component\injector
 
 	public static function select($columns='*', $condition=null, array $bind=null)
 	{
+		if($columns==='*' or (is_string($columns) and !ctype_digit($columns))) {
+			$key = static::DB.':'.static::TABLE;
+			if(!isset(static::$_query[$key])) {
+				static::$_query[$key]= static::$_locator->get('query\pdo', array(static::DB, static::TABLE));
+			}
+
+			$condition = $condition===null ? 1 : $condition;
+			return static::$_query[$key]->select($columns)->where($condition, $bind);
+		}
+
+		$where     = static::_condition($columns);
+		$connection= static::$_locator->pool->getConnection(static::DB, $master=true);
+		$statement = $connection->prepare('SELECT * FROM '.static::TABLE.' WHERE '.$where['condition']);
+		$statement->execute($where['bind']);
+		$result    = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+		if(count($result)==0) {
+			return null;
+		} elseif(strpos($where['condition'], '(')===false) {
+			return current($result);
+		} else {
+			return $result;
+		}
 	}
 
 	public static function update(array $data, $condition=null, array $bind=null)
@@ -60,16 +83,6 @@ class pdo implements \library\orm\table,\component\injector
 	public static function getConnection()
 	{
 		return static::$_locator->pool->getConnection(static::DB, $master=true);
-	}
-
-	protected static function _getQueryInstance()
-	{
-		$key = static::DB.'_'.static::TABLE;
-		if(!isset(static::$_query[$key])) {
-			static::$_query[$key]= static::$_locator->get('query\pdo', array(static::DB, static::TABLE));
-		}
-
-		return static::$_query[$key];
 	}
 
 	protected static function _condition($condition, array $bind=null)
