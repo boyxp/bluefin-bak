@@ -2,7 +2,7 @@
 namespace library\orm\query;
 class pdo implements \library\orm\query,\component\injector
 {
-	private $connection= null;
+	private $database  = null;
 	private $table     = null;
 	private $columns   = '*';
 	private $condition = '1';
@@ -16,10 +16,10 @@ class pdo implements \library\orm\query,\component\injector
 
 	private static $_locator = null;
 
-	public function __construct($connection=null, $table=null)
+	public function __construct($database, $table)
 	{
-		$this->connection = $connection;
-		$this->table      = $table;
+		$this->database = $database;
+		$this->table    = $table;
 	}
 
 	public function select($columns='*')
@@ -91,9 +91,11 @@ class pdo implements \library\orm\query,\component\injector
 
 	public function fetch($resultset=false)
 	{
-		$all  = $this->count===1 ? false : true;
-		$smth = $this->connection->prepare($this->__toString());//==pool
-		$smth->execute($this->bind);
+		$query     = $this->__toString();
+		$connection= static::$_locator->pool->getConnection($this->database, $master=true);
+		$statement = $connection->prepare($query);
+		$statement->execute($this->bind);
+		$result    = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 		$this->columns  = '*';
 		$this->condition= '1';
@@ -105,12 +107,7 @@ class pdo implements \library\orm\query,\component\injector
 		$this->offset   = 0;
 		$this->state    = 0;
 
-		$result = $smth->fetchAll(PDO::FETCH_ASSOC);
-		if(!$all) {
-			return !isset($result[0]) ? null : $result[0];//==new record
-		} else {
-			return !isset($result[0]) ? null : $result;//==new resultset
-		}
+		return count($result)==0 ? null : $result;
 	}
 
 	public function __toString()
