@@ -107,7 +107,13 @@ class pdo implements \library\orm\query,\component\injector
 		$this->offset   = 0;
 		$this->state    = 0;
 
-		return count($result)==0 ? null : $result;
+		if(!isset($result[0])) {
+			return null;
+		} elseif($resultset) {
+			return static::$_locator->get('resultset', array($result));
+		} else {
+			return $result;
+		}
 	}
 
 	public function __toString()
