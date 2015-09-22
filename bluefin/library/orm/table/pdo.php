@@ -33,7 +33,7 @@ class pdo implements \library\orm\table,\component\injector
 		}
 	}
 
-	public static function select($columns='*', $condition=null, array $bind=null)
+	public static function select($columns='*')
 	{
 		if($columns==='*' or (is_string($columns) and !ctype_digit($columns))) {
 			$key = static::DB.':'.static::TABLE;
@@ -41,11 +41,7 @@ class pdo implements \library\orm\table,\component\injector
 				static::$_query[$key]= static::$_locator->get('query\pdo', array(static::DB, static::TABLE));
 			}
 
-			if($condition===null) {
-				return static::$_query[$key]->select($columns);
-			} else {
-				return static::$_query[$key]->select($columns)->where($condition, $bind);
-			}
+			return static::$_query[$key]->select($columns);
 		}
 
 		$where     = static::_condition($columns);
