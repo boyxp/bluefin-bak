@@ -2,7 +2,7 @@
 namespace library\orm\connection;
 class pdo extends \PDO implements \library\orm\connection
 {
-	public function __construct($dsn, $user, $password, array $options=null)
+	public function __construct($dsn, $user='', $password='', array $options=null)
 	{
 		if(strpos(strtolower($dsn), 'charset=')!==false) {
 			preg_match('/charset=([a-z0-9-]+)/i', $dsn, $match);
