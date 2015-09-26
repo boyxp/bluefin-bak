@@ -12,6 +12,7 @@ class _default implements \library\orm\resultset,\component\injector
 		$this->_data = $data;
 	}
 
+
 	public function offset($row_num=0, $offset=0)
 	{
 		$row_num= (int)$row_num;
@@ -92,7 +93,7 @@ class _default implements \library\orm\resultset,\component\injector
 	//Iterator
 	public function current()
 	{
-		return $this->_data[$this->_positon];
+		return static::$_locator->get('record', array($this->_data[$this->_positon]));
 	}
 
 	public function key()
@@ -138,7 +139,7 @@ class _default implements \library\orm\resultset,\component\injector
 
 	public function offsetGet($offset)
 	{
-		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+		return isset($this->_data[$offset]) ? static::$_locator->get('record', array($this->_data[$this->_data[$offset]])) : null;
 	}
 
 	public static function inject(\component\locator $locator)
