@@ -2,12 +2,12 @@
 namespace library\orm\table;
 class pdo implements \library\orm\table,\component\injector
 {
-	const DB    = 'test';
-	const TABLE = 'test';
-	const KEY   = 'id';
+		const DB    = 'test';
+		const TABLE = 'test';
+		const KEY   = 'id';
 
-	protected static $_query  = array();
-	protected static $_locator = null;
+		protected static $_query  = array();
+		protected static $_locator = null;
 
 	public static function insert(array $data=null, $multi=false)
 	{
@@ -37,20 +37,10 @@ class pdo implements \library\orm\table,\component\injector
 		}
 	}
 
-	public static function select($columns='*')
-	{
-		$key = static::DB.':'.static::TABLE;
-		if(!isset(static::$_query[$key])) {
-			static::$_query[$key]= static::$_locator->get('query\pdo', array(static::DB, static::TABLE));
+		public static function select($columns='*')
+		{
+			return static::_getQueryInstance()->select($columns);
 		}
-
-		if($columns==='*' or (is_string($columns) and !ctype_digit($columns))) {
-			return static::$_query[$key]->select($columns);
-		} else {
-			$where = static::_condition($columns);
-			return static::$_query[$key]->select('*')->where($where['condition'], $where['bind']);
-		}
-	}
 
 	public static function update(array $data, $condition=null, array $bind=null)
 	{
@@ -77,45 +67,15 @@ class pdo implements \library\orm\table,\component\injector
 		return static::$_locator->pool->getConnection(static::DB, $master=true);
 	}
 
-	protected static function _condition($condition, array $bind=null)
-	{
-		switch(gettype($condition))
+		protected static function _getQueryInstance()
 		{
-			case 'string' :
-					if(!ctype_digit($condition)) {
-						if(strpos($condition, '(?)')!==false and is_array($bind)) {
-							$condition= str_replace('(?)', '(%s)', $condition);
-							$temp     = array();
-							$holders  = array();
-							foreach($bind as $param) {
-								if(is_array($param)) {
-									$holders[] = '?'.str_repeat(',?', count($param)-1);
-									$temp      = array_merge($temp, $param);
-								} else {
-									$temp[] = $param;
-								}
-							}
+			$key = static::DB.':'.static::TABLE;
+			if(!isset(static::$_query[$key])) {
+				static::$_query[$key] = static::$_locator->get('query\pdo', array(static::DB, static::TABLE, static::KEY));
+			}
 
-							$bind      = $temp;
-							$condition = vsprintf($condition, $holders);
-						}
-						break;
-					}
-			case 'integer':
-					$bind      = array(intval($condition));
-					$condition = static::KEY.'=?';
-					break;
-			case 'array'  :
-					$bind      = $condition;
-					$condition = static::KEY.' IN(?'.str_repeat(',?', count($bind)-1).')';
-					break;
-			default      :
-					throw new exception('syntax error');
-			break;
+			return static::$_query[$key];
 		}
-
-		return array('condition'=>$condition, 'bind'=>$bind);
-	}
 
 	public static function inject(\component\locator $locator)
 	{
