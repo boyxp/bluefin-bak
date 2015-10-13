@@ -5,6 +5,7 @@ class _default implements \library\orm\resultset,\component\injector
 	private $_query   = null;
 	private $_data    = null;
 	private $_positon = 0;
+	private $_record  = array();
 
 	private static $_locator = null;
 
@@ -94,7 +95,11 @@ class _default implements \library\orm\resultset,\component\injector
 	//Iterator
 	public function current()
 	{
-		return static::$_locator->get('record', array($this->_data[$this->_positon], $this->_query));
+		if(!isset($this->_record[$this->_positon])) {
+			$this->_record[$this->_positon] = static::$_locator->get('record', array($this->_data[$this->_positon], $this->_query));
+		}
+
+		return $this->_record[$this->_positon];
 	}
 
 	public function key()
@@ -140,7 +145,15 @@ class _default implements \library\orm\resultset,\component\injector
 
 	public function offsetGet($offset)
 	{
-		return isset($this->_data[$offset]) ? static::$_locator->get('record', array($this->_data[$offset], $this->_query)) : null;
+		if(!isset($this->_data[$offset])) {
+			return null;
+		}
+
+		if(!isset($this->_record[$offset])) {
+			$this->_record[$offset] = static::$_locator->get('record', array($this->_data[$offset], $this->_query));
+		}
+
+		return $this->_record[$offset];
 	}
 
 	public static function inject(\component\locator $locator)
