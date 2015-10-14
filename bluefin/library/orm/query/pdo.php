@@ -14,12 +14,11 @@ class pdo implements \library\orm\query,\component\injector
 		private $order     = array();
 		private $offset    = 0;
 		private $count     = 20;
-
 		private $state     = 0;
 		private $type      = null;
-	private $fields    = array();
-	private $values    = array();
-		private $record = true;
+		private $fields    = array();
+		private $values    = array();
+		private $record    = true;
 
 		const INSERT = 'INSERT';
 		const SELECT = 'SELECT';
@@ -43,13 +42,28 @@ class pdo implements \library\orm\query,\component\injector
 		return $this;
 	}
 
-	public function update(array $data)
-	{
-		$this->fields = array_keys($data);
-		$this->values = array_values($data);
-		$this->state  = 6;
-		return $this;
-	}
+		public function update(array $data)
+		{
+			if($this->state >= 1) { throw new \exception('syntax error'); }
+
+			$this->type = static::UPDATE;
+
+			if(isset($data[$this->key])) {
+				$key = $data[$this->key];
+				unset($data[$this->key]);
+
+				$this->fields = array_keys($data);
+				$this->values = array_values($data);
+
+				return $this->where($key);
+			} else {
+				$this->fields = array_keys($data);
+				$this->values = array_values($data);
+
+				$this->state = 2;
+				return $this;
+			}
+		}
 
 	public function delete()
 	{
@@ -161,15 +175,7 @@ class pdo implements \library\orm\query,\component\injector
 			$statement->execute($this->bind);
 			$result    = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-			$this->columns  = '*';
-			$this->condition= '1';
-			$this->bind     = array();
-			$this->group    = '';
-			$this->having   = '';
-			$this->order    = array();
-			$this->offset   = 0;
-			$this->count    = 20;
-			$this->state    = 0;
+			$this->_reset();
 
 			if(!isset($result[0])) {
 				return null;
@@ -182,10 +188,18 @@ class pdo implements \library\orm\query,\component\injector
 			}
 		}
 
-	public function execute()
-	{
-		if($this->state >= 8) { throw new \exception('syntax error'); }
-	}
+		public function execute()
+		{
+			$query     = $this->__toString();
+			$bind      = array_merge($this->values, $this->bind);
+			$connection= static::$_locator->pool->getConnection($this->database, $master=true);
+			$statement = $connection->prepare($query);
+			$statement->execute($bind);
+
+			$this->_reset();
+
+			return $statement->rowCount();
+		}
 
 		public function __toString()
 		{
@@ -195,15 +209,20 @@ class pdo implements \library\orm\query,\component\injector
 								.(isset($this->order[0]) ? " ORDER BY ".implode(',', $this->order) : "")
 								." LIMIT {$this->offset},{$this->count}";
 						      break;
+				case static::UPDATE : $query =  "UPDATE {$this->table} SET ".join($this->fields, '=?,')."=? "
+								."WHERE {$this->condition} "
+								.(isset($this->order[0]) ? " ORDER BY ".implode(',', $this->order) : "")
+								." LIMIT {$this->count}";
+						      break;
 			}
 
 			return $query;
 		}
 
-	public static function inject(\component\locator $locator)
-	{
-		static::$_locator = $locator;
-	}
+		public static function inject(\component\locator $locator)
+		{
+			static::$_locator = $locator;
+		}
 
 		protected function _condition($condition, array $bind=null)
 		{
@@ -243,5 +262,21 @@ class pdo implements \library\orm\query,\component\injector
 			}
 
 			return array('condition'=>$condition, 'bind'=>$bind);
+		}
+
+		private function _reset()
+		{
+			$this->columns  = '*';
+			$this->condition= '1';
+			$this->bind     = array();
+			$this->group    = '';
+			$this->having   = '';
+			$this->order    = array();
+			$this->offset   = 0;
+			$this->count    = 20;
+			$this->state    = 0;
+			$this->type     = null;
+			$this->fields   = array();
+			$this->values   = array();
 		}
 }
