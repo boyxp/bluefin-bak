@@ -42,16 +42,10 @@ class pdo implements \library\orm\table,\component\injector
 			return static::_getQueryInstance()->select($columns);
 		}
 
-	public static function update(array $data, $condition=null, array $bind=null)
-	{
-		$fields     = array_keys($data);
-		$where      = static::_condition($condition, $bind);
-		$bind       = $where['bind'] ? array_merge(array_values($data), $where['bind']) : array_values($data);
-		$connection = static::$_locator->pool->getConnection(static::DB, $master=true);
-		$statement  = $connection->prepare('UPDATE '.static::TABLE.' SET `'.join($fields, '`=?,`').'`=? WHERE '.$where['condition']);
-		$statement->execute($bind);
-		return $statement->rowCount();
-	}
+		public static function update(array $data)
+		{
+			return static::_getQueryInstance()->update($data);
+		}
 
 	public static function delete($condition=null, array $bind=null)
 	{
