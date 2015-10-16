@@ -25,15 +25,17 @@ class _default implements \library\orm\record
 			$this->_data[$column] = $value;
 		}
 
-	public function save()
-	{
-		if($this->_created) {
-			$this->_key     = $this->_table->insert($this->_data);
-			$this->_created = false;
-		} else {
-			$this->_query->update($this->_data)->execute();
+		public function save()
+		{
+			if($this->_created) {
+				$this->_key     = $this->_query->insert($this->_data)->execute();
+				$this->_created = false;
+			} elseif($this->_key) {
+				$this->_query->update($this->_data)->where($this->_key)->execute();
+			} else {
+				$this->_query->update($this->_data)->execute();
+			}
 		}
-	}
 
 	public function delete()
 	{
