@@ -9,33 +9,15 @@ class pdo implements \library\orm\table,\component\injector
 		protected static $_query  = array();
 		protected static $_locator = null;
 
-	public static function insert(array $data=null, $multi=false)
-	{
-		if($data===null) {
-			return static::$_locator->get('record', array(new static));
-		}
-
-		$fields     = $multi ? array_keys(current($data)) : array_keys($data);
-		$connection = static::$_locator->pool->getConnection(static::DB, $master=true);
-		$statement  = $connection->prepare('INSERT INTO '.static::TABLE.'(`'.join($fields, '`,`').'`)VALUES(?'.str_repeat(',?', count($fields)-1).')');
-
-		if($multi) {
-			$connection->begin();
-			try {
-				foreach($data as $row) {
-					$statement->execute(array_values($row));
-				}
-				$connection->commit();
-				return count($data);
-			} catch(exception $e) {
-				$connection->rollback();
-				return 0;
+		public static function insert(array $data=null)
+		{
+			if($data===null) {
+				$query = static::_getQueryInstance();
+				return static::$_locator->get('record', array(null, $query));
+			} else {
+				return static::_getQueryInstance()->insert($data);
 			}
-		} else {
-			$statement->execute(array_values($data));
-			return $connection->lastInsertId();
 		}
-	}
 
 		public static function select($columns='*')
 		{
