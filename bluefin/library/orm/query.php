@@ -2,7 +2,7 @@
 namespace library\orm;
 interface query
 {
-	public function insert(array $data);
+		public function insert(array $data);
 		public function update(array $data);
 	public function delete();
 		public function select($columns='*');

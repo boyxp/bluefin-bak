@@ -34,13 +34,14 @@ class pdo implements \library\orm\query,\component\injector
 			$this->key      = $key;
 		}
 
-	public function insert(array $data)
-	{
-		$this->fields = array_keys($data);
-		$this->values = array_values($data);
-		$this->state  = 7;
-		return $this;
-	}
+		public function insert(array $data)
+		{
+			$this->type   = static::INSERT;
+			$this->fields = array_keys($data);
+			$this->values = array_values($data);
+			$this->state  = 7;
+			return $this;
+		}
 
 		public function update(array $data)
 		{
@@ -198,7 +199,11 @@ class pdo implements \library\orm\query,\component\injector
 
 			$this->_reset();
 
-			return $statement->rowCount();
+			if($this->type===static::INSERT) {
+				return $connection->lastInsertId();
+			} else {
+				return $statement->rowCount();
+			}
 		}
 
 		public function __toString()
@@ -213,6 +218,8 @@ class pdo implements \library\orm\query,\component\injector
 								."WHERE {$this->condition} "
 								.(isset($this->order[0]) ? " ORDER BY ".implode(',', $this->order) : "")
 								." LIMIT {$this->count}";
+						      break;
+				case static::INSERT : $query = "INSERT INTO {$this->table}(".join($this->fields, ',').")VALUES(?".str_repeat(',?', count($this->fields)-1).")";
 						      break;
 			}
 
@@ -275,7 +282,6 @@ class pdo implements \library\orm\query,\component\injector
 			$this->offset   = 0;
 			$this->count    = 20;
 			$this->state    = 0;
-			$this->type     = null;
 			$this->fields   = array();
 			$this->values   = array();
 		}
