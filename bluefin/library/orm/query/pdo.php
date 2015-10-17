@@ -276,7 +276,7 @@ class pdo implements \library\orm\query,\component\injector
 					$condition = $this->key.' IN(?'.str_repeat(',?', count($bind)-1).')';
 					break;
 			default      :
-					throw new exception('syntax error');
+					throw new \exception('syntax error');
 			break;
 		}
 
