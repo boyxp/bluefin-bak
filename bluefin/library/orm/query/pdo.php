@@ -67,11 +67,16 @@ class pdo implements \library\orm\query,\component\injector
 		}
 	}
 
-	public function delete()
+	public function delete(array $data=null)
 	{
 		if($this->state >= 1) { throw new \exception('syntax error'); }
 
-		$this->type  = static::DELETE;
+		$this->type = static::DELETE;
+
+		if(isset($data[$this->key])) {
+			return $this->where($data[$this->key]);
+		}
+
 		$this->state = 2;
 		return $this;
 	}
