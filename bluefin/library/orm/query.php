@@ -4,7 +4,7 @@ interface query
 {
 	public function insert(array $data);
 	public function update(array $data);
-	public function delete(array $data);
+	public function delete(array $data=null);
 	public function select($columns='*');
 	public function from();
 	public function where($condition, array $bind=null);

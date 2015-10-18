@@ -29,9 +29,9 @@ class pdo implements \library\orm\table,\component\injector
 		return static::_getQueryInstance()->update($data);
 	}
 
-	public static function delete()
+	public static function delete(array $data=null)
 	{
-		return static::_getQueryInstance()->delete();
+		return static::_getQueryInstance()->delete($data);
 	}
 
 	public static function getConnection()
