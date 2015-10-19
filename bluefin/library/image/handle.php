@@ -1,6 +1,6 @@
 <?php
 namespace library\image;
-interface info
+interface handle
 {
 	public function getWidth();
 	public function getHeight();
