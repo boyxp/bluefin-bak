@@ -2,9 +2,15 @@
 namespace library\orm\pool;
 class _default implements \library\orm\pool,\component\injector
 {
+	private static $_registry   = null;
 	private static $_connection = array();
 	private static $_singleton  = array();
 	private static $_locator    = null;
+
+	public function __construct(\component\registry $registry=null)
+	{
+		static::$_registry = $registry;
+	}
 
 	public function addConnection($db, \library\orm\connection $connection, $master=true)
 	{
@@ -24,6 +30,20 @@ class _default implements \library\orm\pool,\component\injector
 			$index = array_rand(static::$_connection[$db][$type]);
 			static::$_singleton[$db][$type] = static::$_connection[$db][$type][$index];
 			return static::$_singleton[$db][$type];
+		}
+
+		if(!static::$_registry) {
+			return null;
+		}
+
+		$config = static::$_registry->get($db);
+		if(isset($config[$type])) {
+			$index   = array_rand($config[$type]);
+			$setting = $config[$type][$index];
+			if(isset($setting['connection']) and isset($setting['param'])) {
+				static::$_singleton[$db][$type] = static::$_locator->get($setting['connection'], $setting['param']);
+				return static::$_singleton[$db][$type];
+			}
 		}
 
 		return null;
@@ -62,5 +82,6 @@ class _default implements \library\orm\pool,\component\injector
 	{
 		static::$_connection = null;
 		static::$_singleton  = null;
+		static::$_registry   = null;
 	}
 }
