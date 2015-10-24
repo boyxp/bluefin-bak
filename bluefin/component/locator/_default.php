@@ -77,15 +77,17 @@ class _default implements \component\locator
 		if(gettype($instance)==='object') {
 			if(strpos($name, '\\')===false) {
 				$impl = 'default';
+				$key  = $name;
 			} else {
 				list($name, $impl) = explode('\\', $name);
+				$key  = $name.'\\'.$impl;
 			}
 
 			$map = $this->_registry->get($name);
 			if(isset($map['interface'])) {
 				$impls = class_implements($instance);
 				if(isset($impls[$map['interface']])) {
-					$this->_instance[$name.'\\'.$impl] = $instance;
+					$this->_instance[$key] = $instance;
 					return true;
 				}
 			} else {
