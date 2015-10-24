@@ -7,9 +7,9 @@ class _default implements \component\router,\component\injector
 	private $_matches  = array();
 	private static $_locator = null;
 
-	public function __construct()
+	public function __construct(\component\registry $registry)
 	{
-		$this->_registry = static::$_locator->get('registry', array('rules'));
+		$this->_registry = $registry;
 	}
 
 	public function addRule($pattern, callable $handle)
