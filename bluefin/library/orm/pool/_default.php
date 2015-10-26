@@ -9,7 +9,7 @@ class _default implements \library\orm\pool,\component\injector
 
 	public function __construct(\component\registry $registry=null)
 	{
-		static::$_registry = $registry;
+		static::$_registry = $registry ? $registry : static::$_locator->get('registry', array('database'));
 	}
 
 	public function addConnection($db, \library\orm\connection $connection, $master=true)
