@@ -38,7 +38,10 @@ class _default implements \library\orm\pool,\component\injector
 
 		$config = static::$_registry->get("{$db}:{$type}");
 		if(!is_array($config) or count($config)===0) {
-			return null;
+			$config = static::$_registry->get($db);
+			if(!is_array($config) or count($config)===0) {
+				return null;
+			}
 		}
 
 		if(isset($config['connection']) and isset($config['param'])) {
