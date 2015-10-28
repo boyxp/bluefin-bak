@@ -8,6 +8,7 @@ class gd implements \library\image\handle
 	private $_mime     = null;
 	private $_format   = null;
 	private $_resource = null;
+
 	public function __construct($image)
 	{
 		$format = array('1' => 'gif', '2' => 'jpeg', '3' => 'png');
@@ -49,8 +50,10 @@ class gd implements \library\image\handle
 		return filesize($this->_file);
 	}
 
-	public function getDirection()
+	public function getOrientation()
 	{
+		$exif = exif_read_data($this->_file);
+		return isset($exif['Orientation']) ? $exif['Orientation'] : 1;
 	}
 
 	public function getResource()
@@ -69,7 +72,14 @@ class gd implements \library\image\handle
 
 	public function __get($key)
 	{
-		$key = '_'.$key;
-		return isset($this->$key) ? $this->$key : null;
+		$property = '_'.$key;
+		$method   = 'get'.$key;
+		if(isset($this->$property)) {
+			return $this->$property;
+		} elseif(method_exists(__CLASS__, $method)) {
+			return $this->$method();
+		} else {
+			return null;
+		}
 	}
 }
