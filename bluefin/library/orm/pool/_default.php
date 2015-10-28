@@ -36,12 +36,21 @@ class _default implements \library\orm\pool,\component\injector
 			return null;
 		}
 
-		$config = static::$_registry->get($db);
-		if(isset($config[$type])) {
-			$index   = array_rand($config[$type]);
-			$setting = $config[$type][$index];
-			if(isset($setting['connection']) and isset($setting['param'])) {
-				static::$_singleton[$db][$type] = static::$_locator->get($setting['connection'], $setting['param']);
+		$config = static::$_registry->get("{$db}:{$type}");
+		if(!is_array($config) or count($config)===0) {
+			return null;
+		}
+
+		if(isset($config['connection']) and isset($config['param'])) {
+			static::$_singleton[$db][$type] = static::$_locator->get($config['connection'], $config['param']);
+			return static::$_singleton[$db][$type];
+		}
+
+		$index = array_rand($config);
+		if(!is_null($index)) {
+			$config = $config[$index];
+			if(isset($config['connection']) and isset($config['param'])) {
+				static::$_singleton[$db][$type] = static::$_locator->get($config['connection'], $config['param']);
 				return static::$_singleton[$db][$type];
 			}
 		}
