@@ -1,6 +1,6 @@
 <?php
 namespace library\image\handle;
-class gd implements \library\image\handle
+class gd implements \library\image\handle,\component\injector
 {
 	private $_file     = null;
 	private $_width    = null;
@@ -8,6 +8,7 @@ class gd implements \library\image\handle
 	private $_mime     = null;
 	private $_format   = null;
 	private $_resource = null;
+	protected static $_locator = null;
 
 	public function __construct($image)
 	{
@@ -81,5 +82,19 @@ class gd implements \library\image\handle
 		} else {
 			return null;
 		}
+	}
+
+	public function __call($method, $args)
+	{
+		$plugin = static::$_locator->get("{$method}\gd");
+		if($plugin) {
+			array_unshift($args, $this);
+			$this->_resource = call_user_func_array(array($plugin, $method), $args);
+		}
+	}
+
+	public static function inject(\component\locator $locator)
+	{
+		static::$_locator = $locator;
 	}
 }
