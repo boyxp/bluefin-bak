@@ -82,4 +82,25 @@ $classmap
 		'default' => 'library\orm\pool\_default',
 	),
 ))
+->set('handle', array(
+	'interface' => 'library\image\handle',
+	'impls'     => array(
+		'default' => 'library\image\handle\gd',
+		'gd'      => 'library\image\handle\gd',
+	),
+))
+->set('rotate', array(
+	'interface' => 'library\image\rotate',
+	'impls'     => array(
+		'default' => 'library\image\rotate\gd',
+		'gd'      => 'library\image\rotate\gd',
+	),
+))
+->set('flip', array(
+	'interface' => 'library\image\flip',
+	'impls'     => array(
+		'default' => 'library\image\flip\gd',
+		'gd'      => 'library\image\flip\gd',
+	),
+))
 ;
