@@ -20,13 +20,14 @@ class redis implements \library\session
 
 	public function open($path=null, $name=null)
 	{
+		return true;
 	}
 
 	public function read($session_id)
 	{
 		$this->cache = $this->redis->get($this->prefix.$session_id);
 		$this->redis->expire($this->prefix.$session_id, $this->life);
-		return $this->cache;
+		return $this->cache===null ? '' : $this->cache;
 	}
 
 	public function write($session_id, $session_data)
@@ -35,19 +36,24 @@ class redis implements \library\session
 			$this->redis->set($this->prefix.$session_id, $session_data);
 			$this->cache = $session_data;
 		}
+
+		return true;
 	}
 
 	public function destroy($session_id)
 	{
 		$this->cache = null;
 		$this->redis->del($this->prefix.$session_id);
+		return true;
 	}
 
 	public function gc($max_life_time)
 	{
+		return true;
 	}
 
 	public function close()
 	{
+		return true;
 	}
 }
