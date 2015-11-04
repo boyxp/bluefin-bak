@@ -2,6 +2,7 @@
 namespace library;
 interface session extends \SessionHandlerInterface
 {
+	public function start();
 	public function setLifeTime($life_time);
 	public function setPath($path);
 	public function setDomain($domain);

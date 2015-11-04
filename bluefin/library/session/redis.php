@@ -15,54 +15,16 @@ class redis implements \library\session
 	{
 		$this->_redis  = $redis;
 		$this->_secure = isset($_SERVER['HTTPS']);
+		$this->_domain = $_SERVER['HTTP_HOST'];
 		session_set_save_handler($this, true);
-		//if(!isset($_COOKIE['PHPSESSID'])) {
-			//session_set_cookie_params($lifetime=1800, $path='/', $domain=$_SERVER['HTTP_HOST'], $secure=, $httponly=true);
-		//}
 	}
 
-	public function setLifeTime($life_time)
+	public function start()
 	{
-		$life_time = intval($life_time);
-		if($life_time > 0) {
-			$this->_life = $life_time;
+		if(!isset($_COOKIE['PHPSESSID'])) {
+			session_set_cookie_params(0, $this->_path, $this->_domain, $this->_secure, $this->_http);
 		}
-
-		return $this;
-	}
-
-	public function setPath($path)
-	{
-		$this->_path = $path;
-		return $this;
-	}
-
-	public function setDomain($domain)
-	{
-		if(strpos($_SERVER['HTTP_HOST'], $domain)!==false) {
-			$this->_domain = $domain;
-		}
-		return $this;
-	}
-
-	public function setSecure($secure)
-	{
-		$this->_secure = $secure ? true : false;
-		return $this;
-	}
-
-	public function setHttpOnly($http_only)
-	{
-		$this->_http = $http_only ? true : false;
-		return $this;
-	}
-
-	public function __set($option, $value)
-	{
-		$method = 'set'.$option;
-		if(method_exists(__CLASS__, $method)) {
-			call_user_func(array($this, $method), $value);
-		}
+		session_start();
 	}
 
 	public function open($path=null, $name=null)
@@ -102,5 +64,50 @@ class redis implements \library\session
 	public function close()
 	{
 		return true;
+	}
+
+
+	public function setLifeTime($life_time)
+	{
+		$life_time = intval($life_time);
+		if($life_time > 0) {
+			$this->_life = $life_time;
+		}
+
+		return $this;
+	}
+
+	public function setPath($path)
+	{
+		$this->_path = $path;
+		return $this;
+	}
+
+	public function setDomain($domain)
+	{
+		if(strpos($_SERVER['HTTP_HOST'], $domain)!==false) {
+			$this->_domain = $domain;
+		}
+		return $this;
+	}
+
+	public function setSecure($secure)
+	{
+		$this->_secure = ($secure and isset($_SERVER['HTTPS']));
+		return $this;
+	}
+
+	public function setHttpOnly($http_only)
+	{
+		$this->_http = $http_only ? true : false;
+		return $this;
+	}
+
+	public function __set($option, $value)
+	{
+		$method = 'set'.$option;
+		if(method_exists(__CLASS__, $method)) {
+			call_user_func(array($this, $method), $value);
+		}
 	}
 }
