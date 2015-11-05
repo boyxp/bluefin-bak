@@ -2,20 +2,45 @@
 namespace library\redis;
 class _default implements \library\redis
 {
-	private $_socket = null;
+	private $_socket   = null;
+	private $_host     = null;
+	private $_port     = null;
+	private $_password = null;
 
 	public function __construct($host='127.0.0.1', $port=6379, $password=null)
 	{
-		$socket = @fsockopen($host, $port, $errno, $error, 5);
-		if(!$socket) {
-			throw new \Exception("Can't connect to Redis server on '{$host}:{$port}'");
-		}
+		$this->_host     = $host;
+		$this->_port     = $port;
+		$this->_password = $password;
+		$this->connect();
+	}
 
-		$this->_socket = $socket;
+	public function connect()
+	{
+		if(!$this->_socket) {
+			$socket = @fsockopen($this->_host, $this->_port, $errno, $error, 5);
+			if(!$socket) {
+				throw new \Exception("Can't connect to Redis server on '{$this->_host}:{$this->_port}'");
+			}
+
+			$this->_socket = $socket;
+		}
+	}
+
+	public function close()
+	{
+		if($this->_socket) {
+			fclose($this->_socket);
+			$this->_socket = null;
+		}
 	}
 
 	public function __call($command, array $args)
 	{
+		if(!$this->_socket) {
+			$this->connect();
+		}
+
 		array_unshift($args, $command);
 		$params = "";
 		$i      = 0;
@@ -97,6 +122,6 @@ class _default implements \library\redis
 
 	public function __destruct()
 	{
-		fclose($this->_socket);
+		$this->close();
 	}
 }
