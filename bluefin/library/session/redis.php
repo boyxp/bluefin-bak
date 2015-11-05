@@ -34,16 +34,20 @@ class redis implements \library\session
 
 	public function read($session_id)
 	{
+		$this->_redis->connect();
 		$this->_cache = $this->_redis->get($this->_prefix.$session_id);
 		$this->_redis->expire($this->_prefix.$session_id, $this->_life);
+		$this->_redis->close();
 		return $this->_cache===null ? '' : $this->_cache;
 	}
 
 	public function write($session_id, $session_data)
 	{
-		if($this->_cache!==$session_data) {
+		if($session_data and $this->_cache!==$session_data) {
+			$this->_redis->connect();
 			$this->_redis->set($this->_prefix.$session_id, $session_data);
 			$this->_cache = $session_data;
+			$this->_redis->close();
 		}
 
 		return true;
