@@ -16,6 +16,7 @@ class redis implements \library\session
 		$this->_redis  = $redis;
 		$this->_secure = isset($_SERVER['HTTPS']);
 		$this->_domain = $_SERVER['HTTP_HOST'];
+		$this->_prefix = "SESSION:{$_SERVER['HTTP_HOST']}:";
 		session_set_save_handler($this, true);
 	}
 
@@ -90,6 +91,7 @@ class redis implements \library\session
 	{
 		if(strpos($_SERVER['HTTP_HOST'], $domain)!==false) {
 			$this->_domain = $domain;
+			$this->_prefix = "SESSION:{$domain}:";
 		}
 		return $this;
 	}
