@@ -21,9 +21,8 @@ class redis implements \library\session
 
 	public function start()
 	{
-		if(!isset($_COOKIE['PHPSESSID'])) {
-			session_set_cookie_params(0, $this->_path, $this->_domain, $this->_secure, $this->_http);
-		}
+		session_name('SECUREID');
+		session_set_cookie_params(0, $this->_path, $this->_domain, $this->_secure, $this->_http);
 		session_start();
 	}
 
