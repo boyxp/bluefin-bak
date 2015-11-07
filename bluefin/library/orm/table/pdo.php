@@ -2,6 +2,7 @@
 namespace library\orm\table;
 class pdo implements \library\orm\table,\component\injector
 {
+	const DRIVER= 'pdo';
 	const DB    = 'test';
 	const TABLE = 'test';
 	const KEY   = 'id';
@@ -43,7 +44,7 @@ class pdo implements \library\orm\table,\component\injector
 	{
 		$key = static::DB.':'.static::TABLE;
 		if(!isset(static::$_query[$key])) {
-			static::$_query[$key] = static::$_locator->get('query\pdo', array(static::DB, static::TABLE, static::KEY));
+			static::$_query[$key] = static::$_locator->get('query\\'.static::DRIVER, array(static::DB, static::TABLE, static::KEY));
 		}
 
 		return static::$_query[$key];
