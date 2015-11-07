@@ -103,4 +103,11 @@ $classmap
 		'gd'      => 'library\image\flip\gd',
 	),
 ))
+->set('session', array(
+	'interface' => 'library\session',
+	'impls'     => array(
+		'default' => 'library\session\redis',
+		'gd'      => 'library\session\redis',
+	),
+))
 ;
