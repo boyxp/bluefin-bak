@@ -72,8 +72,8 @@ $classmap
 ->set('table', array(
 	'interface' => 'library\orm\table',
 	'impls'     => array(
-		'default' => 'library\orm\table\pdo',
-		'pdo'     => 'library\orm\table\pdo',
+		'default' => 'library\orm\table\_default',
+		'pdo'     => 'library\orm\table\_default',
 	),
 ))
 ->set('pool', array(

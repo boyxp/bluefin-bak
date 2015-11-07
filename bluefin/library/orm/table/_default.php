@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\table;
-class pdo implements \library\orm\table,\component\injector
+class _default implements \library\orm\table,\component\injector
 {
 	const DRIVER= 'pdo';
 	const DB    = 'test';
