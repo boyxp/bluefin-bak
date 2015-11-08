@@ -48,6 +48,7 @@ $classmap
 	'impls'     => array(
 		'default' => 'library\orm\connection\pdo',
 		'pdo'     => 'library\orm\connection\pdo',
+		'mongo'   => 'library\orm\connection\mongo',
 	),
 ))
 ->set('resultset', array(
