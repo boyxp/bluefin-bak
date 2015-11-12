@@ -5,8 +5,8 @@ class mongo implements \library\orm\query,\component\injector
 	private $database  = null;
 	private $table     = null;
 		private $columns   = '*';
-		private $condition = '1';
-		private $bind      = array();
+	private $condition = '_id is not null';
+	private $bind      = array();
 		private $group     = '';
 		private $having    = '';
 		private $order     = array();
@@ -19,7 +19,7 @@ class mongo implements \library\orm\query,\component\injector
 
 	const INSERT = 'INSERT';
 		const SELECT = 'SELECT';
-		const UPDATE = 'UPDATE';
+	const UPDATE = 'UPDATE';
 		const DELETE = 'DELETE';
 
 	private static $_locator = null;
@@ -40,28 +40,25 @@ class mongo implements \library\orm\query,\component\injector
 		return $this;
 	}
 
-		public function update(array $data)
-		{
-			if($this->state >= 1) { throw new \exception('syntax error'); }
+	public function update(array $data)
+	{
+		if($this->state >= 1) { throw new \exception('syntax error'); }
 
-			$this->type = static::UPDATE;
+		$this->type = static::UPDATE;
 
-			if(isset($data[$this->key])) {
-				$key = $data[$this->key];
-				unset($data[$this->key]);
+		if(isset($data['_id'])) {
+			$key = $data['_id'];
+			unset($data['_id']);
 
-				$this->fields = array_keys($data);
-				$this->values = array_values($data);
+			$this->data = $data;
 
-				return $this->where($key);
-			} else {
-				$this->fields = array_keys($data);
-				$this->values = array_values($data);
-
-				$this->state = 2;
-				return $this;
-			}
+			return $this->where($key);
+		} else {
+			$this->data  = $data;
+			$this->state = 2;
+			return $this;
 		}
+	}
 
 		public function delete(array $data=null)
 		{
@@ -102,16 +99,16 @@ class mongo implements \library\orm\query,\component\injector
 			return $this;
 		}
 
-		public function where($condition, array $bind=null)
-		{
-			if($this->state >= 3) { throw new \exception('syntax error'); }
+	public function where($condition, array $bind=null)
+	{
+		if($this->state >= 3) { throw new \exception('syntax error'); }
 
-			$where = static::_condition($condition, $bind);
-			$this->condition = $where['condition'];
-			$this->bind      = $where['bind'];
-			$this->state     = 3;
-			return $this;
-		}
+		$where = static::_condition($condition, $bind);
+		$this->condition = $where['condition'];
+		$this->bind      = $where['bind'];
+		$this->state     = 3;
+		return $this;
+	}
 
 		public function group($fields)
 		{
@@ -201,10 +198,21 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		$connection = static::$_locator->pool->getConnection($this->database);
 		$collection = $connection->selectCollection($this->table);
+
+		if($this->type!==static::INSERT) {
+			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+			$tree     = \library\orm\query\mongo\parser::parse($tokens);
+			$criteria = $this->_bind($tree, $this->bind);print_r($criteria);
+		}
+
 		switch($this->type) {
 			case static::INSERT :
 					      $collection->save($this->data, array('w'=>1));
 					      return strval($this->data['_id']);
+					      break;
+			case static::UPDATE :
+					      $result = $collection->update($criteria, array('$set'=>$this->data), array('multiple'=>1, 'w'=>1));
+					      return isset($result['n']) ? $result['n'] : 0;
 					      break;
 		}
 	}
@@ -214,51 +222,66 @@ class mongo implements \library\orm\query,\component\injector
 		static::$_locator = $locator;
 	}
 
-		protected function _condition($condition, array $bind=null)
+	protected function _condition($condition, array $bind=null)
+	{
+		switch(gettype($condition))
 		{
-			switch(gettype($condition))
-			{
-				case 'string' :
-						if(!ctype_digit($condition)) {
-							if(strpos($condition, '(?)')!==false and is_array($bind)) {
-								$condition= str_replace('(?)', '(%s)', $condition);
-								$temp     = array();
-								$holders  = array();
-								foreach($bind as $param) {
-									if(is_array($param)) {
-										$holders[] = '?'.str_repeat(',?', count($param)-1);
-										$temp      = array_merge($temp, $param);
-									} else {
-										$temp[] = $param;
-									}
-								}
-
-								$bind      = $temp;
-								$condition = vsprintf($condition, $holders);
-							}
-							break;
-						}
-				case 'integer':
-						$bind      = array(intval($condition));
-						$condition = $this->key.'=?';
+			case 'string' :
+					if(!ctype_alnum($condition)) {
 						break;
-				case 'array'  :
-						$bind      = $condition;
-						$condition = $this->key.' IN(?'.str_repeat(',?', count($bind)-1).')';
-						break;
-				default      :
-						throw new \exception('syntax error');
-				break;
-			}
-
-			return array('condition'=>$condition, 'bind'=>$bind);
+					}
+			case 'integer':
+					$bind      = array($condition);
+					$condition = '_id=?';
+					break;
+			case 'array'  :
+					$bind      = array($condition);
+					$condition = '_id IN(?)';
+					break;
+			default      :
+					throw new \exception('syntax error');
+			break;
 		}
+
+		return array('condition'=>$condition, 'bind'=>$bind);
+	}
+
+	protected function _bind(array &$tree, array &$bind)
+	{
+		foreach($tree as $key=>$conds) {
+			if(is_array($conds)) {
+				$tree[$key] = $this->{__FUNCTION__}($conds, $bind);
+			} elseif($conds==='?') {
+				$value = array_shift($bind);
+				if($value===null) { throw new \exception('SQL parameter is missing'); }
+				if($key==='$like') {
+					unset($tree[$key]);
+					$head   = substr($value, 0, 1);
+					$tail   = substr($value, -1);
+					$middle = substr($value, 1, -1);
+					$head   = $head==='%' ? '' : '^'.$head;
+					$tail   = $tail==='%' ? '' : $tail.'$';
+					$middle = str_replace('%', '.+', $middle);
+					$middle = str_replace('_', '.', $middle);
+					$value  = $head.$middle.$tail;
+					$key    = '$regex';
+				}
+				$tree[$key] = $value;
+			} elseif($key==='$exists') {
+				continue;
+			} else {
+				throw new \exception('syntax error');
+			}
+		}
+
+		return $tree;
+	}
 
 	private function _reset()
 	{
 			$this->columns  = '*';
-			$this->condition= '1';
-			$this->bind     = array();
+		$this->condition= '1';
+		$this->bind     = array();
 			$this->group    = '';
 			$this->having   = '';
 			$this->order    = array();
