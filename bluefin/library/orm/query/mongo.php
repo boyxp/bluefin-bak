@@ -20,7 +20,7 @@ class mongo implements \library\orm\query,\component\injector
 	const INSERT = 'INSERT';
 		const SELECT = 'SELECT';
 	const UPDATE = 'UPDATE';
-		const DELETE = 'DELETE';
+	const DELETE = 'DELETE';
 
 	private static $_locator = null;
 
@@ -60,19 +60,19 @@ class mongo implements \library\orm\query,\component\injector
 		}
 	}
 
-		public function delete(array $data=null)
-		{
-			if($this->state >= 1) { throw new \exception('syntax error'); }
+	public function delete(array $data=null)
+	{
+		if($this->state >= 1) { throw new \exception('syntax error'); }
 
-			$this->type = static::DELETE;
+		$this->type = static::DELETE;
 
-			if(isset($data[$this->key])) {
-				return $this->where($data[$this->key]);
-			}
-
-			$this->state = 2;
-			return $this;
+		if(isset($data['_id'])) {
+			return $this->where($data['_id']);
 		}
+
+		$this->state = 2;
+		return $this;
+	}
 
 		public function select($columns='*')
 		{
@@ -202,7 +202,7 @@ class mongo implements \library\orm\query,\component\injector
 		if($this->type!==static::INSERT) {
 			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
 			$tree     = \library\orm\query\mongo\parser::parse($tokens);
-			$criteria = $this->_bind($tree, $this->bind);print_r($criteria);
+			$criteria = $this->_bind($tree, $this->bind);
 		}
 
 		switch($this->type) {
@@ -212,6 +212,10 @@ class mongo implements \library\orm\query,\component\injector
 					      break;
 			case static::UPDATE :
 					      $result = $collection->update($criteria, array('$set'=>$this->data), array('multiple'=>1, 'w'=>1));
+					      return isset($result['n']) ? $result['n'] : 0;
+					      break;
+			case static::DELETE :
+					      $result = $collection->remove($criteria, array('multiple'=>1, 'w'=>1));
 					      return isset($result['n']) ? $result['n'] : 0;
 					      break;
 		}
@@ -280,7 +284,7 @@ class mongo implements \library\orm\query,\component\injector
 	private function _reset()
 	{
 			$this->columns  = '*';
-		$this->condition= '1';
+		$this->condition= '_id is not null';
 		$this->bind     = array();
 			$this->group    = '';
 			$this->having   = '';
