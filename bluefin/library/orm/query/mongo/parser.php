@@ -64,6 +64,9 @@ class parser
 						case 'regexp' :
 							$oprts = '$regex';
 						break;
+						case 'near' :
+							$oprts = '$near';
+						break;
 						case 'in' :
 							if(isset($oprts) and $oprts==='not') {
 								$oprts = '$nin';
