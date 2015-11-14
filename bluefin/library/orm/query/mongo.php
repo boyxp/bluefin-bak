@@ -269,6 +269,21 @@ class mongo implements \library\orm\query,\component\injector
 					$middle = str_replace('_', '.', $middle);
 					$value  = $head.$middle.$tail;
 					$key    = '$regex';
+				} elseif($key==='$near') {
+					if(!is_array($value) and count($value)>1) {
+						throw new \exception('syntax error');
+					}
+
+					$longitude = floatval(array_shift($value));
+					$latitude  = floatval(array_shift($value));
+					$distance  = count($value)===0 ? 2000 : intval(array_shift($value));
+					$value     = array(
+						'$geometry'   => array(
+							'type'        => 'Point',
+							'coordinates' => array($longitude, $latitude)
+						),
+						'$maxDistance'=> $distance,
+					);
 				}
 				$tree[$key] = $value;
 			} elseif($key==='$exists') {
