@@ -253,7 +253,7 @@ class pdo implements \library\orm\query,\component\injector
 		switch(gettype($condition))
 		{
 			case 'string' :
-					if(!ctype_digit($condition)) {
+					if(!ctype_alnum($condition)) {
 						if(strpos($condition, '(?)')!==false and is_array($bind)) {
 							$condition= str_replace('(?)', '(%s)', $condition);
 							$temp     = array();
@@ -273,7 +273,7 @@ class pdo implements \library\orm\query,\component\injector
 						break;
 					}
 			case 'integer':
-					$bind      = array(intval($condition));
+					$bind      = array($condition);
 					$condition = $this->key.'=?';
 					break;
 			case 'array'  :
