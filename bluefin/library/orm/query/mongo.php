@@ -4,21 +4,21 @@ class mongo implements \library\orm\query,\component\injector
 {
 	private $database  = null;
 	private $table     = null;
-		private $columns   = '*';
+	private $columns   = null;
 	private $condition = '_id is not null';
 	private $bind      = array();
 		private $group     = '';
 		private $having    = '';
-		private $order     = array();
-		private $offset    = 0;
-		private $count     = 20;
+	private $order     = array();
+	private $offset    = 0;
+	private $count     = 20;
 	private $state     = 0;
 	private $type      = null;
 	private $data      = array();
-		private $record    = true;
+	private $record    = true;
 
 	const INSERT = 'INSERT';
-		const SELECT = 'SELECT';
+	const SELECT = 'SELECT';
 	const UPDATE = 'UPDATE';
 	const DELETE = 'DELETE';
 
@@ -74,30 +74,35 @@ class mongo implements \library\orm\query,\component\injector
 		return $this;
 	}
 
-		public function select($columns='*')
-		{
-			if($this->state >= 1) { throw new \exception('syntax error'); }
+	public function select($columns=null)
+	{
+		if($this->state >= 1) { throw new \exception('syntax error'); }
 
-			if(strpos($columns, '(')!==false and preg_match('/\s(?:avg|count|max|min|sum)\s*\(/i', ' '.$columns)) {
-				$this->record  = false;
-				$this->columns = $columns;
-			} else {
-				$this->record  = true;
-				$this->columns = $columns.','.$this->key;
+		if(strpos($columns, '(')!==false and preg_match('/\s(?:avg|count|max|min|sum)\s*\(/i', ' '.$columns)) {
+			$this->record = false;
+		} else {
+			$this->record = true;
+			if(!is_null($columns) and $columns!=='*') {
+				$fields = explode(',', $columns);
+				$this->columns = array();
+				foreach($fields as $field) {
+					$this->columns[$field] = true;
+				}
 			}
-
-			$this->type  = static::SELECT;
-			$this->state = 1;
-			return $this;
 		}
 
-		public function from()
-		{
-			if($this->state >= 2) { throw new \exception('syntax error'); }
+		$this->type  = static::SELECT;
+		$this->state = 1;
+		return $this;
+	}
 
-			$this->state = 2;
-			return $this;
-		}
+	public function from()
+	{
+		if($this->state >= 2) { throw new \exception('syntax error'); }
+
+		$this->state = 2;
+		return $this;
+	}
 
 	public function where($condition, array $bind=null)
 	{
@@ -131,68 +136,79 @@ class mongo implements \library\orm\query,\component\injector
 			return $this;
 		}
 
-		public function order($field, $direction='ASC')
-		{
-			if($this->state > 6) { throw new \exception('syntax error'); }
+	public function order($field, $direction='ASC')
+	{
+		if($this->state > 6) { throw new \exception('syntax error'); }
 
-			$this->order[] = $field.' '.$direction;
-			$this->state   = 6;
-			return $this;
-		}
+		$this->order[$field] = strtolower($direction)==='asc' ? 1 : -1;
+		$this->state         = 6;
+		return $this;
+	}
 
-		public function limit($offset=20, $count=null)
-		{
-			if($this->state >= 7) { throw new \exception('syntax error'); }
+	public function limit($offset=20, $count=null)
+	{
+		if($this->state >= 7) { throw new \exception('syntax error'); }
 
-			if(is_null($count)) {
-				$this->offset = 0;
-				$this->count  = $offset;
-			} else {
-				$this->offset = $offset;
-				$this->count  = $count;
-			}
-
-			$this->state  = 7;
-			return $this;
-		}
-
-		public function fetch($record=true)
-		{
+		if(is_null($count)) {
 			$this->offset = 0;
-			$this->count  = 1;
-
-			$result = $this->fetchAll(false);
-			if(!isset($result[0])) {
-				return null;
-			} elseif($record===false) {
-				return $result[0];
-			} elseif($this->record===false) {
-				return static::$_locator->get('record', array($result[0]));
-			} else {
-				return static::$_locator->get('record', array($result[0], $this, $result[0][$this->key]));
-			}
+			$this->count  = $offset;
+		} else {
+			$this->offset = $offset;
+			$this->count  = $count;
 		}
 
-		public function fetchAll($resultset=true)
-		{
-			$query     = $this->__toString();
-			$connection= static::$_locator->pool->getConnection($this->database, $master=true);
-			$statement = $connection->prepare($query);
-			$statement->execute($this->bind);
-			$result    = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$this->state  = 7;
+		return $this;
+	}
 
-			$this->_reset();
+	public function fetch($record=true)
+	{
+		$this->offset = 0;
+		$this->count  = 1;
 
-			if(!isset($result[0])) {
-				return null;
-			} elseif($resultset===false) {
-				return $result;
-			} elseif($this->record===false) {
-				return static::$_locator->get('resultset', array($result));
-			} else {
-				return static::$_locator->get('resultset', array($result, $this));
-			}
+		$result = $this->fetchAll(false);
+		if(!isset($result[0])) {
+			return null;
+		} elseif($record===false) {
+			return $result[0];
+		} elseif($this->record===false) {
+			return static::$_locator->get('record', array($result[0]));
+		} else {
+			return static::$_locator->get('record', array($result[0], $this, $result[0]['_id']));
 		}
+	}
+
+	public function fetchAll($resultset=true)
+	{
+		$connection = static::$_locator->pool->getConnection($this->database);
+		$collection = $connection->selectCollection($this->table);
+		$tokens     = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+		$tree       = \library\orm\query\mongo\parser::parse($tokens);
+		$criteria   = $this->_bind($tree, $this->bind);
+		$cursor     = $this->columns ? $collection->find($criteria, $this->columns) : $collection->find($criteria);
+		$cursor     = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
+		$cursor     = $cursor->skip($this->offset)->limit($this->count);
+		$result     = array();
+
+		foreach($cursor as $row) {
+			if(isset($row['_id'])) {
+				$row['_id'] = strval($row['_id']);
+			}
+			$result[] = $row;
+		}
+
+		$this->_reset();
+
+		if(!isset($result[0])) {
+			return null;
+		} elseif($resultset===false) {
+			return $result;
+		} elseif($this->record===false) {
+			return static::$_locator->get('resultset', array($result));
+		} else {
+			return static::$_locator->get('resultset', array($result, $this));
+		}
+	}
 
 	public function execute()
 	{
@@ -233,6 +249,10 @@ class mongo implements \library\orm\query,\component\injector
 			case 'string' :
 					if(!ctype_alnum($condition)) {
 						break;
+					}
+
+					if(strlen($condition)===24) {
+						$condition = new \MongoId($condition);
 					}
 			case 'integer':
 					$bind      = array($condition);
@@ -298,14 +318,14 @@ class mongo implements \library\orm\query,\component\injector
 
 	private function _reset()
 	{
-			$this->columns  = '*';
+		$this->columns  = null;
 		$this->condition= '_id is not null';
 		$this->bind     = array();
 			$this->group    = '';
 			$this->having   = '';
-			$this->order    = array();
-			$this->offset   = 0;
-			$this->count    = 20;
+		$this->order    = array();
+		$this->offset   = 0;
+		$this->count    = 20;
 		$this->state    = 0;
 		$this->data     = array();
 	}
