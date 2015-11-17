@@ -7,6 +7,8 @@ class mongo implements \library\orm\query,\component\injector
 	private $columns   = null;
 	private $condition = '_id is not null';
 	private $bind      = array();
+	private $project   = null;
+	private $aggregate = null;
 		private $group     = '';
 		private $having    = '';
 	private $order     = array();
@@ -78,8 +80,29 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		if($this->state >= 1) { throw new \exception('syntax error'); }
 
-		if(strpos($columns, '(')!==false and preg_match('/\s(?:avg|count|max|min|sum)\s*\(/i', ' '.$columns)) {
+		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
 			$this->record = false;
+			$project = array();
+			$fields  = explode(',', $columns);
+			foreach($fields as $field) {
+				if(strpos($field, '(')===false) {
+					$project[$field] = 1;
+				}
+			}
+			$this->project = count($project)===0 ? null : $project;
+
+			$aggregate = array();
+			foreach($matches[1] as $key=>$function) {
+				$field = $matches[2][$key];
+				$as    = empty($matches[3][$key]) ? $function : $matches[3][$key];
+				if($function==='count') {
+					$aggregate[$as] = array('$sum'=>1);
+				} else {
+					$aggregate[$as] = array("\${$function}"=>"\${$field}");
+				}
+			}
+			$this->aggregate = $aggregate;
+
 		} else {
 			$this->record = true;
 			if(!is_null($columns) and $columns!=='*') {
@@ -115,26 +138,37 @@ class mongo implements \library\orm\query,\component\injector
 		return $this;
 	}
 
-		public function group($fields)
-		{
-			if($this->record or $this->state >= 4) {
-				throw new \exception('syntax error');
+	public function group($fields)
+	{
+		if($this->record or $this->state >= 4) {
+			throw new \exception('syntax error');
+		}
+
+		if(strpos($fields, ',')===false) {
+			$this->group = '$'.$fields;
+		} else {
+			$group  = array();
+			$fields = explode(',', $fields);
+			foreach($fields as $field) {
+				$group[$field] = '$'.$field;
 			}
-
-			$this->group = "GROUP BY {$fields}";
-			$this->state = 4;
-			return $this;
+			$this->group = $group;
 		}
 
-		public function having($condition, array $bind=null)
-		{
-			if($this->state != 4) { throw new \exception('syntax error'); }
+		$this->state = 4;
+		return $this;
+	}
 
-			$this->bind   = is_null($bind) ? $this->bind : array_merge($this->bind, $bind);
-			$this->having = "HAVING {$condition}";
-			$this->state  = 5;
-			return $this;
-		}
+	public function having($condition, array $bind=null)
+	{
+		if($this->state != 4) { throw new \exception('syntax error'); }
+
+		$where = static::_condition($condition, $bind);
+		$this->having = $where['condition'];
+		$this->bind   = is_null($bind) ? $this->bind : array_merge($this->bind, $bind);
+		$this->state  = 5;
+		return $this;
+	}
 
 	public function order($field, $direction='ASC')
 	{
@@ -321,6 +355,8 @@ class mongo implements \library\orm\query,\component\injector
 		$this->columns  = null;
 		$this->condition= '_id is not null';
 		$this->bind     = array();
+		$this->project  = null;
+		$this->aggregate= null;
 			$this->group    = '';
 			$this->having   = '';
 		$this->order    = array();
