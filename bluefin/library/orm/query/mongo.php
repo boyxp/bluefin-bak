@@ -9,8 +9,8 @@ class mongo implements \library\orm\query,\component\injector
 	private $bind      = array();
 	private $project   = null;
 	private $aggregate = null;
-		private $group     = '';
-		private $having    = '';
+	private $group     = '';
+	private $having    = '';
 	private $order     = array();
 	private $offset    = 0;
 	private $count     = 20;
@@ -81,7 +81,6 @@ class mongo implements \library\orm\query,\component\injector
 		if($this->state >= 1) { throw new \exception('syntax error'); }
 
 		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
-			$this->record = false;
 			$project = array();
 			$fields  = explode(',', $columns);
 			foreach($fields as $field) {
@@ -103,6 +102,7 @@ class mongo implements \library\orm\query,\component\injector
 			}
 			$this->aggregate = $aggregate;
 
+			$this->record = false;
 		} else {
 			$this->record = true;
 			if(!is_null($columns) and $columns!=='*') {
@@ -216,19 +216,53 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		$connection = static::$_locator->pool->getConnection($this->database);
 		$collection = $connection->selectCollection($this->table);
-		$tokens     = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-		$tree       = \library\orm\query\mongo\parser::parse($tokens);
-		$criteria   = $this->_bind($tree, $this->bind);
-		$cursor     = $this->columns ? $collection->find($criteria, $this->columns) : $collection->find($criteria);
-		$cursor     = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
-		$cursor     = $cursor->skip($this->offset)->limit($this->count);
-		$result     = array();
 
-		foreach($cursor as $row) {
-			if(isset($row['_id'])) {
-				$row['_id'] = strval($row['_id']);
+		if($this->record) {
+			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+			$tree     = \library\orm\query\mongo\parser::parse($tokens);
+			$criteria = $this->_bind($tree, $this->bind);
+			$cursor   = $this->columns ? $collection->find($criteria, $this->columns) : $collection->find($criteria);
+			$cursor   = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
+			$cursor   = $cursor->skip($this->offset)->limit($this->count);
+			$result   = array();
+
+			foreach($cursor as $row) {
+				if(isset($row['_id'])) {
+					$row['_id'] = strval($row['_id']);
+				}
+				$result[] = $row;
 			}
-			$result[] = $row;
+		} else {
+			$ops   = array();
+			$tokens= \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+			$tree  = \library\orm\query\mongo\parser::parse($tokens);
+			$where = $this->_bind($tree, $this->bind);
+
+			$ops[] = array('$match'=>$where);
+
+			$this->aggregate['_id'] = $this->group ? $this->group : null;
+			$ops[] = array('$group'=>$this->aggregate);
+
+			if($this->having) {
+				$tokens = \library\orm\query\mongo\tokenizer::tokenize($this->having);
+				$tree   = \library\orm\query\mongo\parser::parse($tokens);
+				$having = $this->_bind($tree, $this->bind);
+				$ops[]  = array('$match'=>$having);
+			}
+
+			if(!empty($this->order)) {
+				$ops[] = array('$sort'=>$this->order);
+			}
+
+			$ops[] = array('$skip' =>$this->offset);
+			$ops[] = array('$limit'=>$this->count);
+
+			if($this->project) {
+				//$ops[] = array('$project'=>$this->project);
+			}
+
+			$result = call_user_func_array(array($collection, 'aggregate'), $ops);
+			$result = $result['result'];
 		}
 
 		$this->_reset();
@@ -357,8 +391,8 @@ class mongo implements \library\orm\query,\component\injector
 		$this->bind     = array();
 		$this->project  = null;
 		$this->aggregate= null;
-			$this->group    = '';
-			$this->having   = '';
+		$this->group    = '';
+		$this->having   = '';
 		$this->order    = array();
 		$this->offset   = 0;
 		$this->count    = 20;
