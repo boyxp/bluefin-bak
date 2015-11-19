@@ -144,17 +144,13 @@ class mongo implements \library\orm\query,\component\injector
 			throw new \exception('syntax error');
 		}
 
-		if(strpos($fields, ',')===false) {
-			$this->group = '$'.$fields;
-		} else {
-			$group  = array();
-			$fields = explode(',', $fields);
-			foreach($fields as $field) {
-				$group[$field] = '$'.$field;
-			}
-			$this->group = $group;
+		$group  = array();
+		$fields = explode(',', $fields);
+		foreach($fields as $field) {
+			$group[$field] = '$'.$field;
 		}
 
+		$this->group = $group;
 		$this->state = 4;
 		return $this;
 	}
@@ -257,12 +253,14 @@ class mongo implements \library\orm\query,\component\injector
 			$ops[] = array('$skip' =>$this->offset);
 			$ops[] = array('$limit'=>$this->count);
 
-			if($this->project) {
-				//$ops[] = array('$project'=>$this->project);
-			}
-
 			$result = call_user_func_array(array($collection, 'aggregate'), $ops);
 			$result = $result['result'];
+
+			foreach($result as $key=>$row) {
+				$row = array_merge($row['_id'], $row);
+				unset($row['_id']);
+				$result[$key] = $row;
+			}
 		}
 
 		$this->_reset();
