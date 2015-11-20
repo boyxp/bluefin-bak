@@ -204,7 +204,7 @@ class mongo implements \library\orm\query,\component\injector
 		} elseif($this->record===false) {
 			return static::$_locator->get('record', array($result[0]));
 		} else {
-			return static::$_locator->get('record', array($result[0], $this, $result[0]['_id']));
+			return static::$_locator->get('record', array($result[0], $this));
 		}
 	}
 
