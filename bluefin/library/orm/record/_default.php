@@ -26,6 +26,10 @@ class _default implements \library\orm\record
 
 	public function save()
 	{
+		if(is_null($this->_query)) {
+			return false;
+		}
+
 		if($this->_created) {
 			$this->_key     = $this->_query->insert($this->_data)->execute();
 			$this->_created = false;
@@ -38,6 +42,10 @@ class _default implements \library\orm\record
 
 	public function delete()
 	{
+		if(is_null($this->_query)) {
+			return false;
+		}
+
 		if($this->_created===false) {
 			$this->_query->delete($this->_data)->execute();
 			$this->_key     = null;
