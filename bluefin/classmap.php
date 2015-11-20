@@ -68,6 +68,7 @@ $classmap
 	'impls'     => array(
 		'default' => 'library\orm\query\pdo',
 		'pdo'     => 'library\orm\query\pdo',
+		'mongo'   => 'library\orm\query\mongo',
 	),
 ))
 ->set('table', array(
