@@ -213,11 +213,15 @@ class mongo implements \library\orm\query,\component\injector
 		$connection = static::$_locator->pool->getConnection($this->database);
 		$collection = $connection->selectCollection($this->table);
 
+		$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+		$tree     = \library\orm\query\mongo\parser::parse($tokens);
+		$where    = $this->_bind($tree, $this->bind);
+
 		if($this->record) {
-			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-			$tree     = \library\orm\query\mongo\parser::parse($tokens);
-			$criteria = $this->_bind($tree, $this->bind);
-			$cursor   = $this->columns ? $collection->find($criteria, $this->columns) : $collection->find($criteria);
+			
+			
+			
+			$cursor   = $this->columns ? $collection->find($where, $this->columns) : $collection->find($where);
 			$cursor   = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
 			$cursor   = $cursor->skip($this->offset)->limit($this->count);
 			$result   = array();
@@ -228,12 +232,9 @@ class mongo implements \library\orm\query,\component\injector
 				}
 				$result[] = $row;
 			}
+		} elseif(empty($this->group)) {
 		} else {
 			$ops   = array();
-			$tokens= \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-			$tree  = \library\orm\query\mongo\parser::parse($tokens);
-			$where = $this->_bind($tree, $this->bind);
-
 			$ops[] = array('$match'=>$where);
 
 			$this->aggregate['_id'] = $this->group ? $this->group : null;
