@@ -131,6 +131,7 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		if($this->state >= 3) { throw new \exception('syntax error'); }
 
+		$bind  = is_null($bind) ? array() : $bind;
 		$where = static::_condition($condition, $bind);
 		$this->condition = $where['condition'];
 		$this->bind      = $where['bind'];
@@ -212,19 +213,15 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		$connection = static::$_locator->pool->getConnection($this->database);
 		$collection = $connection->selectCollection($this->table);
-
-		$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-		$tree     = \library\orm\query\mongo\parser::parse($tokens);
-		$where    = $this->_bind($tree, $this->bind);
+		$tokens     = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
+		$tree       = \library\orm\query\mongo\parser::parse($tokens);
+		$where      = $this->_bind($tree, $this->bind);
 
 		if($this->record) {
-			
-			
-			
-			$cursor   = $this->columns ? $collection->find($where, $this->columns) : $collection->find($where);
-			$cursor   = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
-			$cursor   = $cursor->skip($this->offset)->limit($this->count);
-			$result   = array();
+			$cursor = $this->columns ? $collection->find($where, $this->columns) : $collection->find($where);
+			$cursor = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
+			$cursor = $cursor->skip($this->offset)->limit($this->count);
+			$result = array();
 
 			foreach($cursor as $row) {
 				if(isset($row['_id'])) {
@@ -232,10 +229,11 @@ class mongo implements \library\orm\query,\component\injector
 				}
 				$result[] = $row;
 			}
+
 		} elseif(empty($this->group)) {
+return 'aa';
 		} else {
-			$ops   = array();
-			$ops[] = array('$match'=>$where);
+			$ops = array(array('$match'=>$where));
 
 			$this->aggregate['_id'] = $this->group ? $this->group : null;
 			$ops[] = array('$group'=>$this->aggregate);
@@ -309,7 +307,7 @@ class mongo implements \library\orm\query,\component\injector
 		static::$_locator = $locator;
 	}
 
-	protected function _condition($condition, array $bind=null)
+	protected function _condition($condition, array $bind)
 	{
 		switch(gettype($condition))
 		{
@@ -337,7 +335,7 @@ class mongo implements \library\orm\query,\component\injector
 		return array('condition'=>$condition, 'bind'=>$bind);
 	}
 
-	protected function _bind(array &$tree, array &$bind)
+	protected function _bind(array &$tree, array &$bind=null)
 	{
 		foreach($tree as $key=>$conds) {
 			if(is_array($conds)) {

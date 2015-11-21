@@ -110,6 +110,7 @@ class pdo implements \library\orm\query,\component\injector
 	{
 		if($this->state >= 3) { throw new \exception('syntax error'); }
 
+		$bind  = is_null($bind) ? array() : $bind;
 		$where = static::_condition($condition, $bind);
 		$this->condition = $where['condition'];
 		$this->bind      = $where['bind'];
