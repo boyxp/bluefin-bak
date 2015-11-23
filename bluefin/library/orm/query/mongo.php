@@ -7,7 +7,6 @@ class mongo implements \library\orm\query,\component\injector
 	private $columns   = null;
 	private $condition = '_id is not null';
 	private $bind      = array();
-	private $project   = null;
 	private $aggregate = null;
 	private $group     = '';
 	private $having    = '';
@@ -81,15 +80,6 @@ class mongo implements \library\orm\query,\component\injector
 		if($this->state >= 1) { throw new \exception('syntax error'); }
 
 		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
-			$project = array();
-			$fields  = explode(',', $columns);
-			foreach($fields as $field) {
-				if(strpos($field, '(')===false) {
-					$project[$field] = 1;
-				}
-			}
-			$this->project = count($project)===0 ? null : $project;
-
 			$aggregate = array();
 			foreach($matches[1] as $key=>$function) {
 				$field = $matches[2][$key];
@@ -231,7 +221,7 @@ class mongo implements \library\orm\query,\component\injector
 			}
 
 		} elseif(empty($this->group)) {
-return 'aa';
+return $this->aggregate;
 		} else {
 			$ops = array(array('$match'=>$where));
 
@@ -386,7 +376,6 @@ return 'aa';
 		$this->columns  = null;
 		$this->condition= '_id is not null';
 		$this->bind     = array();
-		$this->project  = null;
 		$this->aggregate= null;
 		$this->group    = '';
 		$this->having   = '';
