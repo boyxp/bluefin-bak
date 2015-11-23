@@ -245,7 +245,7 @@ class mongo implements \library\orm\query,\component\injector
 
 			if($this->group) {
 				foreach($result as $key=>$row) {
-					$row = is_null($row['_id']) ? $row : array_merge($row['_id'], $row);
+					$row = array_merge($row['_id'], $row);
 					unset($row['_id']);
 					$result[$key] = $row;
 				}
