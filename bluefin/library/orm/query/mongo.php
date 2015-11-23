@@ -220,8 +220,6 @@ class mongo implements \library\orm\query,\component\injector
 				$result[] = $row;
 			}
 
-		} elseif(empty($this->group)) {
-return $this->aggregate;
 		} else {
 			$ops = array(array('$match'=>$where));
 
@@ -245,10 +243,17 @@ return $this->aggregate;
 			$result = call_user_func_array(array($collection, 'aggregate'), $ops);
 			$result = $result['result'];
 
-			foreach($result as $key=>$row) {
-				$row = array_merge($row['_id'], $row);
-				unset($row['_id']);
-				$result[$key] = $row;
+			if($this->group) {
+				foreach($result as $key=>$row) {
+					$row = is_null($row['_id']) ? $row : array_merge($row['_id'], $row);
+					unset($row['_id']);
+					$result[$key] = $row;
+				}
+			} else {
+				foreach($result as $key=>$row) {
+					unset($row['_id']);
+					$result[$key] = $row;
+				}
 			}
 		}
 
