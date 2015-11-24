@@ -3,10 +3,19 @@ namespace component\request;
 class _default implements \component\request
 {
 	private $_pathinfo;
+	private $_uri = null;
 
 	public function __construct()
 	{
-		$this->_pathinfo = pathinfo($_SERVER['REQUEST_URI']);
+		if(strpos($_SERVER['REQUEST_URI'], '?')!==false) {
+			list($uri, $query) = explode('?', $_SERVER['REQUEST_URI']);
+			parse_str($query, $_GET);
+		} else {
+			$uri = $_SERVER['REQUEST_URI'];
+		}
+
+		$this->_pathinfo = pathinfo($uri);
+		$this->_uri      = $uri;
 	}
 
 	public function getMethod()
@@ -16,7 +25,7 @@ class _default implements \component\request
 
 	public function getUri()
 	{
-		return $_SERVER['REQUEST_URI'];
+		return $this->_uri;
 	}
 
 	public function getScheme()
