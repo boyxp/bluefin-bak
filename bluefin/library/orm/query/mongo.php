@@ -284,17 +284,22 @@ class mongo implements \library\orm\query,\component\injector
 		switch($this->type) {
 			case static::INSERT :
 					      $collection->save($this->data, array('w'=>1));
-					      return strval($this->data['_id']);
+					      $result = strval($this->data['_id']);
 					      break;
 			case static::UPDATE :
 					      $result = $collection->update($criteria, array('$set'=>$this->data), array('multiple'=>1, 'w'=>1));
-					      return isset($result['n']) ? $result['n'] : 0;
+					      $result = isset($result['n']) ? $result['n'] : 0;
 					      break;
 			case static::DELETE :
 					      $result = $collection->remove($criteria, array('multiple'=>1, 'w'=>1));
-					      return isset($result['n']) ? $result['n'] : 0;
+					      $result = isset($result['n']) ? $result['n'] : 0;
 					      break;
+			default             : $result = null;
 		}
+
+		$this->_reset();
+
+		return $result;
 	}
 
 	public static function inject(\component\locator $locator)
