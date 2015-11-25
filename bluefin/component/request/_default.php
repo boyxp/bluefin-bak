@@ -3,13 +3,14 @@ namespace component\request;
 class _default implements \component\request
 {
 	private $_pathinfo;
-	private $_uri = null;
+	private $_uri   = null;
+	private $_query = null;
 
 	public function __construct()
 	{
 		if(strpos($_SERVER['REQUEST_URI'], '?')!==false) {
 			list($uri, $query) = explode('?', $_SERVER['REQUEST_URI']);
-			parse_str($query, $_GET);
+			parse_str($query, $this->_query);
 		} else {
 			$uri = $_SERVER['REQUEST_URI'];
 		}
@@ -70,7 +71,7 @@ class _default implements \component\request
 
 	public function getQuery($name=null, $default=null)
 	{
-		return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $default;
+		return isset($this->_query[$name]) ? $this->_query[$name] : $default;
 	}
 
 	public function getClientIp()
