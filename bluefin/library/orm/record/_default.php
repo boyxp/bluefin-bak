@@ -38,6 +38,8 @@ class _default implements \library\orm\record
 		} else {
 			$this->_query->update($this->_data)->execute();
 		}
+
+		return $this->_key;
 	}
 
 	public function delete()
