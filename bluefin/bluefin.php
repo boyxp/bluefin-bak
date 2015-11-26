@@ -8,6 +8,7 @@ spl_autoload_register(function($class) use(&$locator) {
 	if(isset($impls['component\injector'])) {
 		call_user_func(array($class, 'inject'), $locator);
 	}
+	unset($impls);
 	return true;
 });
 
@@ -17,6 +18,7 @@ if(isset($locator)) {
 	if(!isset($impls['component\locator'])) {
 		throw new exception('$locator must implement interface \component\locator');
 	}
+	unset($impls);
 } else {
 	$classmap = new \component\registry\apc('classmap');
 	$version  = filemtime(__DIR__.'/classmap.php');
@@ -26,6 +28,7 @@ if(isset($locator)) {
 	}
 
 	$locator = new \component\locator\_default($classmap);
+	unset($version, $classmap);
 }
 
 //injector
