@@ -6,12 +6,6 @@ $classmap
 		'default' => 'component\dispatcher\_default',
 	),
 ))
-->set('injector', array(
-	'interface' => 'component\injector',
-	'impls'     => array(
-		'default' => 'component\injector\_default',
-	),
-))
 ->set('registry', array(
 	'interface' => 'component\registry',
 	'impls'     => array(
