@@ -2,11 +2,13 @@
 namespace component\registry;
 class apc implements \component\registry
 {
-	private $_prefix;
+	private $_prefix = '';
 
 	public function __construct($prefix=null)
 	{
-		$this->_prefix = $_SERVER['HTTP_HOST'].':';
+		if(isset($_SERVER['HTTP_HOST'])) {
+			$this->_prefix .= $_SERVER['HTTP_HOST'].':';
+		}
 
 		if($prefix!==null and is_string($prefix)) {
 			$this->_prefix .= $prefix.':';
