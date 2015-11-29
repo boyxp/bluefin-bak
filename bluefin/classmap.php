@@ -99,6 +99,13 @@ $classmap
 		'gd'      => 'library\image\flip\gd',
 	),
 ))
+->set('resize', array(
+	'interface' => 'library\image\resize',
+	'impls'     => array(
+		'default' => 'library\image\resize\gd',
+		'gd'      => 'library\image\resize\gd',
+	),
+))
 ->set('session', array(
 	'interface' => 'library\session',
 	'impls'     => array(
