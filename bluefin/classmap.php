@@ -25,6 +25,15 @@ $classmap
 		'default' => 'component\response\_default',
 	),
 ))
+->set('view', array(
+	'interface' => 'component\view',
+	'impls'     => array(
+		'default' => 'component\view\json',
+		'html'    => 'component\view\html',
+		'xml'     => 'component\view\xml',
+		'json'    => 'component\view\json',
+	),
+))
 ->set('router', array(
 	'interface' => 'component\router',
 	'impls'     => array(
