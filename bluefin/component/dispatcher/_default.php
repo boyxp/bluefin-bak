@@ -11,7 +11,7 @@ class _default implements \component\dispatcher
 	* $dispatcher->dispatch('login');//函数调用
 	* $dispatcher->dispatch(function(){return rand(0, 99);});//闭包调用
 	*/
-	public function dispatch(callable $handle, array $params=array())
+	public function dispatch($handle, array $params=array())
 	{
 		if(is_array($handle) and is_string($handle[0])) {
 			$handle[0] = new $handle[0];

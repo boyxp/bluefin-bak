@@ -12,7 +12,7 @@ class _default implements \component\router,\component\injector
 		$this->_registry = $registry ? $registry : static::$_locator->get('registry', array('rules'));
 	}
 
-	public function addRule($pattern, callable $handle)
+	public function addRule($pattern, $handle)
 	{
 		if(strpos($pattern, '*')===false) {
 			$this->_registry->set("STATIC:{$pattern}", $handle);
