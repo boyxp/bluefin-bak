@@ -13,6 +13,5 @@ class json implements \component\view
 	{
 		header("Content-type: application/json;charset={$this->_charset}");
 		echo json_encode($params);
-		exit;
 	}
 }

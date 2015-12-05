@@ -24,7 +24,6 @@ class xml implements \component\view
 
 		$this->_xml->endDocument();
 		echo $this->_xml->outputMemory(true);
-		exit;
 	}
 
 	private function _build($data, $node='node')

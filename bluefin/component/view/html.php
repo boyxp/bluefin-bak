@@ -20,6 +20,5 @@ class html implements \component\view
 		}
 
 		include($this->_template);
-		exit;
 	}
 }
