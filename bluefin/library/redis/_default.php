@@ -12,7 +12,6 @@ class _default implements \library\redis
 		$this->_host     = $host;
 		$this->_port     = $port;
 		$this->_password = $password;
-		$this->connect();
 	}
 
 	public function connect()
@@ -37,9 +36,7 @@ class _default implements \library\redis
 
 	public function __call($command, array $args)
 	{
-		if(!$this->_socket) {
-			$this->connect();
-		}
+		$this->connect();
 
 		array_unshift($args, $command);
 		$params = "";
