@@ -15,7 +15,7 @@ class mongo extends \MongoDB implements \library\orm\connection
 			$options['password'] = $password;
 		}
 
-		$options['connectTimeoutMS'] = isset($options['connectTimeoutMS']) ? $options['connectTimeoutMS'] : 50;
+		$options['connectTimeoutMS'] = isset($options['connectTimeoutMS']) ? $options['connectTimeoutMS'] : 2000;
 		$options['db']               = isset($options['db']) ? $options['db'] : 'admin';
 
 		try {
