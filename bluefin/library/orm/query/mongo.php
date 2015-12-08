@@ -53,7 +53,7 @@ class mongo implements \library\orm\query,\component\injector
 
 			$this->data = $data;
 
-			return $this->where($key);
+			return $this->where('_id=?', array($key));
 		} else {
 			$this->data  = $data;
 			$this->state = 2;
@@ -68,7 +68,7 @@ class mongo implements \library\orm\query,\component\injector
 		$this->type = static::DELETE;
 
 		if(isset($data['_id'])) {
-			return $this->where($data['_id']);
+			return $this->where('_id=?', array($data['_id']));
 		}
 
 		$this->state = 2;
