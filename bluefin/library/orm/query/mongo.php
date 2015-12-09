@@ -279,6 +279,19 @@ class mongo implements \library\orm\query,\component\injector
 			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
 			$tree     = \library\orm\query\mongo\parser::parse($tokens);
 			$criteria = $this->_bind($tree, $this->bind);
+
+			$cursor   = $collection->find($criteria, array('_id'));
+			$cursor   = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
+			$cursor   = $cursor->limit($this->count);
+			if($cursor->count(true)>0) {
+				$keys = array();
+				foreach($cursor as $row) {
+					$keys[] = $row['_id'];
+				}
+				$criteria = array('_id'=>array('$in'=>$keys));
+			} else {
+				return 0;
+			}
 		}
 
 		switch($this->type) {
