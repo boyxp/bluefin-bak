@@ -14,7 +14,7 @@ class parser
 
 		$tree = static::_tree();
 		if(!isset($tree['conds'][0])) { throw new \exception('syntax error'); }
-		return count($tree['conds'][0])===1 ? current(current($tree['conds'][0])) : $tree['conds'][0];
+		return count(current($tree['conds'][0]))===1 ? current(current($tree['conds'][0])) : $tree['conds'][0];
 	}
 
 	private static function _tree()
