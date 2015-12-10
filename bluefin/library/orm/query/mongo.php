@@ -77,7 +77,7 @@ class mongo implements \library\orm\query,\component\injector
 
 	public function select($columns=null)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \exception('syntax error', 2001); }
 
 		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
 			$aggregate = array();
@@ -203,8 +203,7 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		$connection = static::$_locator->pool->getConnection($this->database);
 		$collection = $connection->selectCollection($this->table);
-		$tokens     = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-		$tree       = \library\orm\query\mongo\parser::parse($tokens);
+		$tree       = $this->_parse($this->condition);
 		$where      = $this->_bind($tree, $this->bind);
 
 		if($this->record) {
@@ -227,8 +226,7 @@ class mongo implements \library\orm\query,\component\injector
 			$ops[] = array('$group'=>$this->aggregate);
 
 			if($this->having) {
-				$tokens = \library\orm\query\mongo\tokenizer::tokenize($this->having);
-				$tree   = \library\orm\query\mongo\parser::parse($tokens);
+				$tree   = $this->_parse($this->having);
 				$having = $this->_bind($tree, $this->bind);
 				$ops[]  = array('$match'=>$having);
 			}
@@ -276,8 +274,7 @@ class mongo implements \library\orm\query,\component\injector
 		$collection = $connection->selectCollection($this->table);
 
 		if($this->type!==static::INSERT) {
-			$tokens   = \library\orm\query\mongo\tokenizer::tokenize($this->condition);
-			$tree     = \library\orm\query\mongo\parser::parse($tokens);
+			$tree     = $this->_parse($this->condition);
 			$criteria = $this->_bind($tree, $this->bind);
 
 			$cursor   = $collection->find($criteria, array('_id'));
@@ -290,6 +287,7 @@ class mongo implements \library\orm\query,\component\injector
 				}
 				$criteria = array('_id'=>array('$in'=>$keys));
 			} else {
+				$this->_reset();
 				return 0;
 			}
 		}
@@ -318,6 +316,13 @@ class mongo implements \library\orm\query,\component\injector
 	public static function inject(\component\locator $locator)
 	{
 		static::$_locator = $locator;
+	}
+
+	protected function _parse($condition)
+	{
+		$tokens = \library\orm\query\mongo\tokenizer::tokenize($condition);
+		$tree   = \library\orm\query\mongo\parser::parse($tokens);
+		return $tree;
 	}
 
 	protected function _condition($condition, array $bind)
