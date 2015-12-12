@@ -17,6 +17,7 @@ class mongo implements \library\orm\query,\component\injector
 	private $type      = null;
 	private $data      = array();
 	private $record    = true;
+	private $registry  = null;
 
 	const INSERT = 'INSERT';
 	const SELECT = 'SELECT';
@@ -29,6 +30,7 @@ class mongo implements \library\orm\query,\component\injector
 	{
 		$this->database = $database;
 		$this->table    = $table;
+		$this->registry = static::$_locator->get('registry', array('mongo:SQL'));
 	}
 
 	public function insert(array $data)
@@ -320,8 +322,20 @@ class mongo implements \library\orm\query,\component\injector
 
 	protected function _parse($condition)
 	{
+		if($this->registry) {
+			$cache = $this->registry->get($condition);
+			if($cache) {
+				return $cache;
+			}
+		}
+
 		$tokens = \library\orm\query\mongo\tokenizer::tokenize($condition);
 		$tree   = \library\orm\query\mongo\parser::parse($tokens);
+
+		if($this->registry) {
+			$this->registry->set($condition, $tree);
+		}
+
 		return $tree;
 	}
 
