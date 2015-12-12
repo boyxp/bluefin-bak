@@ -329,8 +329,8 @@ class mongo implements \library\orm\query,\component\injector
 			}
 		}
 
-		$tokens = \library\orm\query\mongo\tokenizer::tokenize($condition);
-		$tree   = \library\orm\query\mongo\parser::parse($tokens);
+		$tokens = mongo\tokenizer::tokenize($condition);
+		$tree   = mongo\parser::parse($tokens);
 
 		if($this->registry) {
 			$this->registry->set($condition, $tree);
