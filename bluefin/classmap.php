@@ -122,4 +122,10 @@ $classmap
 		'redis'   => 'library\session\redis',
 	),
 ))
+->set('file', array(
+	'interface' => 'library\file\info',
+	'impls'     => array(
+		'default' => 'library\file\info\_default',
+	),
+))
 ;
