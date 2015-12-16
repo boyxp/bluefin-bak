@@ -10,7 +10,7 @@ spl_autoload_register(function($class) use(&$locator) {
 	}
 	unset($impls);
 	return true;
-});
+}, true, true);
 
 //locator
 if(isset($locator)) {
