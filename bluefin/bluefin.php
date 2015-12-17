@@ -3,7 +3,7 @@
 defined('ROOT') or define('ROOT', realpath('../'));
 set_include_path(get_include_path().PATH_SEPARATOR.__DIR__.PATH_SEPARATOR.ROOT);
 spl_autoload_register(function($class) use(&$locator) {
-	include(strtr($class, '\\', '/').'.php');
+	include(strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
 	$impls = class_implements($class, false);
 	if(isset($impls['component\injector'])) {
 		call_user_func(array($class, 'inject'), $locator);
