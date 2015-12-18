@@ -1,6 +1,6 @@
 <?php
-namespace library;
-interface log
+namespace library\log;
+interface writer
 {
 	public function write($log);
 }
