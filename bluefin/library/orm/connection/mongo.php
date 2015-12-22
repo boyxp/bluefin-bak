@@ -16,7 +16,7 @@ class mongo extends \MongoDB implements \library\orm\connection
 		}
 
 		$options['connectTimeoutMS'] = isset($options['connectTimeoutMS']) ? $options['connectTimeoutMS'] : 2000;
-		$options['db']               = isset($options['db']) ? $options['db'] : 'admin';
+		$options['db']               = isset($options['db']) ? $options['db'] : 'test';
 
 		try {
 			if(!isset(static::$_connection[$dsn])) {
