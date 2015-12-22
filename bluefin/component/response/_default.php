@@ -47,7 +47,7 @@ class _default implements \component\response
 
 		if($this->_body!=='' and $this->_status==200) {
 			header("Content-Length: ".strlen($this->_body));
-			die($this->_body);
+			echo $this->_body;
 		}
 	}
 
