@@ -1,5 +1,5 @@
 <?php
-namespace component;
+namespace library\mvc;
 interface view
 {
 	public function render(array $params=null);

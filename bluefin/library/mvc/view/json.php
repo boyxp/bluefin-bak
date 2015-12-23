@@ -1,6 +1,6 @@
 <?php
-namespace component\view;
-class json implements \component\view
+namespace library\mvc\view;
+class json implements \library\mvc\view
 {
 	private $_charset = null;
 

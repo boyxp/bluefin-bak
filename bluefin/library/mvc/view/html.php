@@ -1,6 +1,6 @@
 <?php
-namespace component\view;
-class html implements \component\view
+namespace library\mvc\view;
+class html implements \library\mvc\view
 {
 	private $_template = null;
 
