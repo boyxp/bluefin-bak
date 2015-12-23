@@ -128,4 +128,16 @@ $classmap
 		'default' => 'library\file\info\_default',
 	),
 ))
+->set('logWriter', array(
+	'interface' => 'library\log\writer',
+	'impls'     => array(
+		'default' => 'library\log\writer\file',
+	),
+))
+->set('logReader', array(
+	'interface' => 'library\log\reader',
+	'impls'     => array(
+		'default' => 'library\log\reader\file',
+	),
+))
 ;
