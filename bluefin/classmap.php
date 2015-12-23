@@ -26,12 +26,12 @@ $classmap
 	),
 ))
 ->set('view', array(
-	'interface' => 'component\view',
+	'interface' => 'library\mvc\view',
 	'impls'     => array(
-		'default' => 'component\view\json',
-		'html'    => 'component\view\html',
-		'xml'     => 'component\view\xml',
-		'json'    => 'component\view\json',
+		'default' => 'library\mvc\view\json',
+		'html'    => 'library\mvc\view\html',
+		'xml'     => 'library\mvc\view\xml',
+		'json'    => 'library\mvc\view\json',
 	),
 ))
 ->set('router', array(
