@@ -140,4 +140,11 @@ $classmap
 		'default' => 'library\log\reader\file',
 	),
 ))
+->set('crypt', array(
+	'interface' => 'library\crypto\crypt',
+	'impls'     => array(
+		'default' => 'library\crypto\crypt\openssl',
+		'openssl' => 'library\crypto\crypt\openssl',
+	),
+))
 ;

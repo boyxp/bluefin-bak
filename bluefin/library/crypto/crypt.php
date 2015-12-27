@@ -1,4 +1,5 @@
 <?php
+namespace library\crypto;
 interface crypt
 {
 	public function encrypt($data);
