@@ -1,7 +1,6 @@
 <?php
 //loader
-defined('ROOT') or define('ROOT', realpath('../'));
-set_include_path(get_include_path().PATH_SEPARATOR.__DIR__.PATH_SEPARATOR.ROOT);
+set_include_path(__DIR__.PATH_SEPARATOR.get_include_path());
 spl_autoload_register(function($class) use(&$locator) {
 	include(strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
 	$impls = class_implements($class, false);
