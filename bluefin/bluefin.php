@@ -29,6 +29,3 @@ if(isset($locator)) {
 	$locator = new \component\locator\_default($classmap);
 	unset($version, $classmap);
 }
-
-//injector
-class_alias('\component\injector\_default', 'injector');
