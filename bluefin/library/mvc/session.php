@@ -1,5 +1,5 @@
 <?php
-namespace library;
+namespace library\mvc;
 interface session extends \SessionHandlerInterface
 {
 	public function start();

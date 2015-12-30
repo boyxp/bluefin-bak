@@ -116,10 +116,10 @@ $classmap
 	),
 ))
 ->set('session', array(
-	'interface' => 'library\session',
+	'interface' => 'library\mvc\session',
 	'impls'     => array(
-		'default' => 'library\session\redis',
-		'redis'   => 'library\session\redis',
+		'default' => 'library\mvc\session\redis',
+		'redis'   => 'library\mvc\session\redis',
 	),
 ))
 ->set('file', array(

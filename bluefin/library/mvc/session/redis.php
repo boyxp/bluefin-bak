@@ -1,6 +1,6 @@
 <?php
-namespace library\session;
-class redis implements \library\session
+namespace library\mvc\session;
+class redis implements \library\mvc\session
 {
 	private $_life   = 1200;
 	private $_path   = '/';
