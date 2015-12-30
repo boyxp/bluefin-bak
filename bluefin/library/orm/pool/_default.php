@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\pool;
-use library\orm;
+use library\orm\connection as connection;
 use library\orm\pool as pool;
 use component\injector as injector;
 use component\locator  as locator;
