@@ -1,6 +1,9 @@
 <?php
 namespace library\image\handle;
-class gd implements \library\image\handle,\component\injector
+use library\image\handle as handle;
+use component\injector   as injector;
+use component\locator    as locator;
+class gd implements handle,injector
 {
 	private $_file     = null;
 	private $_width    = null;
@@ -93,7 +96,7 @@ class gd implements \library\image\handle,\component\injector
 		}
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

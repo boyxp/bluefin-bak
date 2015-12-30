@@ -1,18 +1,23 @@
 <?php
 namespace library\orm\pool;
-class _default implements \library\orm\pool,\component\injector
+use library\orm;
+use library\orm\pool as pool;
+use component\injector as injector;
+use component\locator  as locator;
+use component\registry  as registry;
+class _default implements pool,injector
 {
 	private static $_registry   = null;
 	private static $_connection = array();
 	private static $_singleton  = array();
 	private static $_locator    = null;
 
-	public function __construct(\component\registry $registry=null)
+	public function __construct(registry $registry=null)
 	{
 		static::$_registry = $registry ? $registry : static::$_locator->get('registry', array('database'));
 	}
 
-	public function addConnection($db, \library\orm\connection $connection, $master=true)
+	public function addConnection($db, connection $connection, $master=true)
 	{
 		$type = $master ? 'master' : 'slave';
 		static::$_connection[$db][$type][] = $connection;
@@ -80,12 +85,12 @@ class _default implements \library\orm\pool,\component\injector
 		return $this->getConnection($db);
 	}
 
-	public function __set($db, \library\orm\connection $connection)
+	public function __set($db, connection $connection)
 	{
 		$this->addConnection($db, $connection);
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

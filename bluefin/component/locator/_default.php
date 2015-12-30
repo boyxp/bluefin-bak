@@ -1,11 +1,13 @@
 <?php
 namespace component\locator;
-class _default implements \component\locator
+use component\locator as locator;
+use component\registry as registry;
+class _default implements locator
 {
 	private $_registry = null;
 	private $_instance = array();
 
-	public function __construct(\component\registry $registry)
+	public function __construct(registry $registry)
 	{
 		$this->_registry = $registry;
 	}

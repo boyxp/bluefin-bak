@@ -6,5 +6,5 @@ interface resultset extends \Countable,\Iterator,\ArrayAccess
 	public function column($column_key=null, $index_key=null);
 	public function each(callable $callback);
 	public function map(callable $callback);
-	public function join(\library\orm\resultset $result, $left_key=null, $right_key=null);
+	public function join(resultset $result, $left_key=null, $right_key=null);
 }

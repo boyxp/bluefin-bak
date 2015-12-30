@@ -1,6 +1,9 @@
 <?php
 namespace library\orm\table;
-class _default implements \library\orm\table,\component\injector
+use library\orm\table  as table;
+use component\injector as injector;
+use component\locator  as locator;
+class _default implements table,injector
 {
 	const DRIVER= 'pdo';
 	const DB    = 'test';
@@ -50,7 +53,7 @@ class _default implements \library\orm\table,\component\injector
 		return static::$_query[$key];
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

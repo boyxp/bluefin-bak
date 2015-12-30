@@ -1,6 +1,9 @@
 <?php
 namespace library\orm\resultset;
-class _default implements \library\orm\resultset,\component\injector
+use library\orm\resultset as resultset;
+use component\injector    as injector;
+use component\locator     as locator;
+class _default implements resultset,injector
 {
 	private $_query   = null;
 	private $_data    = null;
@@ -62,7 +65,7 @@ class _default implements \library\orm\resultset,\component\injector
 		return $this;
 	}
 
-	public function join(\library\orm\resultset $result, $left_key=null, $right_key=null)
+	public function join(resultset $result, $left_key=null, $right_key=null)
 	{
 		if(is_null($left_key) and is_null($right_key)) {
 			$key = array_intersect(array_keys($this->_data[0]), array_keys($result[0]));
@@ -156,7 +159,7 @@ class _default implements \library\orm\resultset,\component\injector
 		return $this->_record[$offset];
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

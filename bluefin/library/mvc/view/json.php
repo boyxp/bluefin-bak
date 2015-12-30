@@ -1,6 +1,7 @@
 <?php
 namespace library\mvc\view;
-class json implements \library\mvc\view
+use library\mvc\view as view;
+class json implements view
 {
 	private $_charset = null;
 

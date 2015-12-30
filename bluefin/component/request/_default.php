@@ -1,6 +1,7 @@
 <?php
 namespace component\request;
-class _default implements \component\request
+use component\request as request;
+class _default implements request
 {
 	private $_pathinfo;
 	private $_uri   = null;

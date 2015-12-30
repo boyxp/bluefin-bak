@@ -1,8 +1,10 @@
 <?php
 namespace library\image\rotate;
-class gd implements \library\image\rotate
+use library\image\rotate as rotate;
+use library\image\handle as handle;
+class gd implements rotate
 {
-	public function rotate(\library\image\handle $handle, $angle='auto', $background='#000000')
+	public function rotate(handle $handle, $angle='auto', $background='#000000')
 	{
 		$background = hexdec(ltrim($background, '#'));
 		$resource   = $handle->getResource();

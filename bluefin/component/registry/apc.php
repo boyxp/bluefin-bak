@@ -1,6 +1,7 @@
 <?php
 namespace component\registry;
-class apc implements \component\registry
+use component\registry as registry;
+class apc implements registry
 {
 	private $_prefix = '';
 	private $_cache  = array();

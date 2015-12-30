@@ -1,6 +1,7 @@
 <?php
 namespace library\orm\connection;
-class mongo extends \MongoDB implements \library\orm\connection
+use library\orm\connection as connection;
+class mongo extends \MongoDB implements connection
 {
 	protected static $_connection = array();
 

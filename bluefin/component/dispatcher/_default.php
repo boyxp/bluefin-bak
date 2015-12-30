@@ -1,6 +1,7 @@
 <?php
 namespace component\dispatcher;
-class _default implements \component\dispatcher
+use component\dispatcher as dispatcher;
+class _default implements dispatcher
 {
 	/**
 	* dispatch

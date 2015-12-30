@@ -1,6 +1,9 @@
 <?php
 namespace library\orm\query;
-class mongo implements \library\orm\query,\component\injector
+use library\orm\query  as query;
+use component\injector as injector;
+use component\locator  as locator;
+class mongo implements query,injector
 {
 	private $database  = null;
 	private $table     = null;
@@ -315,7 +318,7 @@ class mongo implements \library\orm\query,\component\injector
 		return $result;
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

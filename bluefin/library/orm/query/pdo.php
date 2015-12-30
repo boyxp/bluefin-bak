@@ -1,6 +1,9 @@
 <?php
 namespace library\orm\query;
-class pdo implements \library\orm\query,\component\injector
+use library\orm\query  as query;
+use component\injector as injector;
+use component\locator  as locator;
+class pdo implements query,injector
 {
 	private $database  = null;
 	private $table     = null;
@@ -244,7 +247,7 @@ class pdo implements \library\orm\query,\component\injector
 		return $query;
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

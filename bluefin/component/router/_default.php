@@ -1,13 +1,17 @@
 <?php
 namespace component\router;
-class _default implements \component\router,\component\injector
+use component\router   as router;
+use component\injector as injector;
+use component\registry as registry;
+use component\locator  as locator;
+class _default implements router,injector
 {
 	private $_registry = null;
 	private $_handle   = null;
 	private $_matches  = array();
 	private static $_locator = null;
 
-	public function __construct(\component\registry $registry=null)
+	public function __construct(registry $registry=null)
 	{
 		$this->_registry = $registry ? $registry : static::$_locator->get('registry', array('rules'));
 	}
@@ -101,7 +105,7 @@ class _default implements \component\router,\component\injector
 		return $this->_matches;
 	}
 
-	public static function inject(\component\locator $locator)
+	public static function inject(locator $locator)
 	{
 		static::$_locator = $locator;
 	}

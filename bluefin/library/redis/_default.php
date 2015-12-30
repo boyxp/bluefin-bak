@@ -1,6 +1,7 @@
 <?php
 namespace library\redis;
-class _default implements \library\redis
+use library\redis as redis;
+class _default implements redis
 {
 	private $_socket   = null;
 	private $_host     = null;

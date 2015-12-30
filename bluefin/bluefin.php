@@ -2,7 +2,7 @@
 //loader
 set_include_path(__DIR__.PATH_SEPARATOR.get_include_path());
 spl_autoload_register(function($class) use(&$locator) {
-	include(strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
+	include(DIRECTORY_SEPARATOR.strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
 	$impls = class_implements($class, false);
 	if(isset($impls['component\injector'])) {
 		call_user_func(array($class, 'inject'), $locator);

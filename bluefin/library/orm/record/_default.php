@@ -1,6 +1,7 @@
 <?php
 namespace library\orm\record;
-class _default implements \library\orm\record
+use library\orm\record as record;
+class _default implements record
 {
 	private $_data    = null;
 	private $_query   = null;

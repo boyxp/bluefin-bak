@@ -1,6 +1,8 @@
 <?php
 namespace library\mvc\session;
-class redis implements \library\mvc\session
+use library\mvc\session as session;
+use library\redis as redis;
+class redis implements session
 {
 	private $_life   = 1200;
 	private $_path   = '/';
@@ -11,7 +13,7 @@ class redis implements \library\mvc\session
 	private $_prefix = 'SESSION:';
 	private $_cache  = null;
 
-	public function __construct(\library\redis $redis)
+	public function __construct(redis $redis)
 	{
 		$this->_redis  = $redis;
 		$this->_secure = isset($_SERVER['HTTPS']);

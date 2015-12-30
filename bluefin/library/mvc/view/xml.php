@@ -1,6 +1,7 @@
 <?php
 namespace library\mvc\view;
-class xml implements \library\mvc\view
+use library\mvc\view as view;
+class xml implements view
 {
 	private $_charset = null;
 	private $_xml     = null;

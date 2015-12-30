@@ -1,6 +1,7 @@
 <?php
 namespace library\file\info;
-class _default implements \library\file\info
+use library\file\info as info;
+class _default implements info
 {
 	private $_file = null;
 

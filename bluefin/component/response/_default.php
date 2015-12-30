@@ -1,6 +1,7 @@
 <?php
 namespace component\response;
-class _default implements \component\response
+use component\response as response;
+class _default implements response
 {
 	private $_status  = 200;
 	private $_body    = '';
