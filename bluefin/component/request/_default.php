@@ -1,6 +1,6 @@
 <?php
 namespace component\request;
-use component\request as request;
+use component\request;
 class _default implements request
 {
 	private $_pathinfo;

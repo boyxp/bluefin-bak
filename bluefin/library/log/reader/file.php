@@ -1,6 +1,6 @@
 <?php
 namespace library\log\reader;
-use library\log\reader as reader;
+use library\log\reader;
 class file implements reader
 {
 	private $handle   = null;

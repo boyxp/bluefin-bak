@@ -1,6 +1,6 @@
 <?php
 namespace library\crypto\crypt;
-use library\crypto\crypt as crypt;
+use library\crypto\crypt;
 class openssl implements crypt
 {
 	private $_password = '';

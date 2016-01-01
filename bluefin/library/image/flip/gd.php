@@ -1,7 +1,7 @@
 <?php
 namespace library\image\flip;
-use library\image\flip as flip;
-use library\image\handle as handle;
+use library\image\flip;
+use library\image\handle;
 class gd implements flip
 {
 	const HORIZONTAL = IMG_FLIP_HORIZONTAL;

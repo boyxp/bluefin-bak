@@ -1,8 +1,8 @@
 <?php
 namespace library\orm\resultset;
-use library\orm\resultset as resultset;
-use component\injector    as injector;
-use component\locator     as locator;
+use library\orm\resultset;
+use component\injector;
+use component\locator;
 class _default implements resultset,injector
 {
 	private $_query   = null;

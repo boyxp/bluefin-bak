@@ -1,6 +1,6 @@
 <?php
 namespace library\mvc\view;
-use library\mvc\view as view;
+use library\mvc\view;
 class html implements view
 {
 	private $_template = null;

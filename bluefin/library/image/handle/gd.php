@@ -1,8 +1,8 @@
 <?php
 namespace library\image\handle;
-use library\image\handle as handle;
-use component\injector   as injector;
-use component\locator    as locator;
+use library\image\handle;
+use component\injector;
+use component\locator;
 class gd implements handle,injector
 {
 	private $_file     = null;

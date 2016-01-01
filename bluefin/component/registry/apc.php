@@ -1,6 +1,6 @@
 <?php
 namespace component\registry;
-use component\registry as registry;
+use component\registry;
 class apc implements registry
 {
 	private $_prefix = '';

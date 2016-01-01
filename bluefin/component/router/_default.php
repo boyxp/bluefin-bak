@@ -1,9 +1,9 @@
 <?php
 namespace component\router;
-use component\router   as router;
-use component\injector as injector;
-use component\registry as registry;
-use component\locator  as locator;
+use component\router;
+use component\injector;
+use component\locator;
+use component\registry;
 class _default implements router,injector
 {
 	private $_registry = null;

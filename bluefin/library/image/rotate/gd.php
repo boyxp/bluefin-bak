@@ -1,7 +1,7 @@
 <?php
 namespace library\image\rotate;
-use library\image\rotate as rotate;
-use library\image\handle as handle;
+use library\image\rotate;
+use library\image\handle;
 class gd implements rotate
 {
 	public function rotate(handle $handle, $angle='auto', $background='#000000')

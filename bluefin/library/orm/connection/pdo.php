@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\connection;
-use library\orm\connection as connection;
+use library\orm\connection;
 class pdo extends \PDO implements connection
 {
 	public function __construct($dsn, $user='', $password='', array $options=null)

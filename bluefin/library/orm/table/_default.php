@@ -1,8 +1,8 @@
 <?php
 namespace library\orm\table;
-use library\orm\table  as table;
-use component\injector as injector;
-use component\locator  as locator;
+use library\orm\table;
+use component\injector;
+use component\locator;
 class _default implements table,injector
 {
 	const DRIVER= 'pdo';

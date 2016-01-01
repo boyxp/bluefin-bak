@@ -19,13 +19,13 @@ if(isset($locator)) {
 	}
 	unset($impls);
 } else {
-	$classmap = new \component\registry\apc('classmap');
+	$classmap = new component\registry\apc('classmap');
 	$version  = filemtime(__DIR__.'/classmap.php');
 	if($classmap->version != $version) {
 		include(__DIR__.'/classmap.php');
 		$classmap->version = $version;
 	}
 
-	$locator = new \component\locator\_default($classmap);
+	$locator = new component\locator\_default($classmap);
 	unset($version, $classmap);
 }

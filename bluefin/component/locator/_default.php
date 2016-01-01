@@ -1,7 +1,7 @@
 <?php
 namespace component\locator;
-use component\locator as locator;
-use component\registry as registry;
+use component\locator;
+use component\registry;
 class _default implements locator
 {
 	private $_registry = null;

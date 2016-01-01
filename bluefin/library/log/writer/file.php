@@ -1,6 +1,6 @@
 <?php
 namespace library\log\writer;
-use library\log\writer as writer;
+use library\log\writer;
 class file implements writer
 {
 	private $handle = null;

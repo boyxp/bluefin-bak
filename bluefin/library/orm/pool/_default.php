@@ -1,10 +1,10 @@
 <?php
 namespace library\orm\pool;
-use library\orm\connection as connection;
-use library\orm\pool as pool;
-use component\injector as injector;
-use component\locator  as locator;
-use component\registry  as registry;
+use library\orm\connection;
+use library\orm\pool;
+use component\injector;
+use component\locator;
+use component\registry;
 class _default implements pool,injector
 {
 	private static $_registry   = null;

@@ -1,6 +1,6 @@
 <?php
 namespace component\response;
-use component\response as response;
+use component\response;
 class _default implements response
 {
 	private $_status  = 200;

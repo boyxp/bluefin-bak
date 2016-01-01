@@ -1,7 +1,7 @@
 <?php
 namespace library\mvc\session;
-use library\mvc\session as session;
-use library\redis as redis;
+use library\mvc\session;
+use library\redis;
 class redis implements session
 {
 	private $_life   = 1200;

@@ -1,8 +1,8 @@
 <?php
 namespace library\orm\query;
-use library\orm\query  as query;
-use component\injector as injector;
-use component\locator  as locator;
+use library\orm\query;
+use component\injector;
+use component\locator;
 class mongo implements query,injector
 {
 	private $database  = null;

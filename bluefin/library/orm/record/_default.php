@@ -1,6 +1,6 @@
 <?php
 namespace library\orm\record;
-use library\orm\record as record;
+use library\orm\record;
 class _default implements record
 {
 	private $_data    = null;

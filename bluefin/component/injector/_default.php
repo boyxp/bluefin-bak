@@ -1,7 +1,7 @@
 <?php
 namespace component\injector;
-use component\injector as injector;
-use component\locator  as locator;
+use component\injector;
+use component\locator;
 class _default implements injector
 {
 	protected static $_locator;
