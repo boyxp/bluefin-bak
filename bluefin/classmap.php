@@ -40,18 +40,13 @@ $classmap
 		'default' => 'component\router\_default',
 	),
 ))
-->set('redis', array(
-	'interface' => 'library\redis',
-	'impls'     => array(
-		'default' => 'library\redis\_default',
-	),
-))
 ->set('connection', array(
 	'interface' => 'library\orm\connection',
 	'impls'     => array(
 		'default' => 'library\orm\connection\pdo',
 		'pdo'     => 'library\orm\connection\pdo',
 		'mongo'   => 'library\orm\connection\mongo',
+		'redis'   => 'library\orm\connection\redis',
 	),
 ))
 ->set('resultset', array(

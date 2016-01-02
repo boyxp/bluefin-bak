@@ -1,7 +1,7 @@
 <?php
 namespace library\orm\connection;
 use library\orm\connection;
-class _default implements connection
+class redis implements connection
 {
 	private $_socket   = null;
 	private $_host     = null;
@@ -15,29 +15,9 @@ class _default implements connection
 		$this->_password = $password;
 	}
 
-	public function connect()
-	{
-		if(!$this->_socket) {
-			$socket = @fsockopen($this->_host, $this->_port, $errno, $error, 5);
-			if(!$socket) {
-				throw new \Exception("Can't connect to Redis server on '{$this->_host}:{$this->_port}'");
-			}
-
-			$this->_socket = $socket;
-		}
-	}
-
-	public function close()
-	{
-		if($this->_socket) {
-			fclose($this->_socket);
-			$this->_socket = null;
-		}
-	}
-
 	public function __call($command, array $args)
 	{
-		$this->connect();
+		$this->_connect();
 
 		array_unshift($args, $command);
 		$params = "";
@@ -77,6 +57,26 @@ class _default implements connection
 	public function rollback()
 	{
 		$this->discard();
+	}
+
+	private function _connect()
+	{
+		if(!$this->_socket) {
+			$socket = @fsockopen($this->_host, $this->_port, $errno, $error, 5);
+			if(!$socket) {
+				throw new \Exception("Can't connect to Redis server on '{$this->_host}:{$this->_port}'");
+			}
+
+			$this->_socket = $socket;
+		}
+	}
+
+	private function _close()
+	{
+		if($this->_socket) {
+			fclose($this->_socket);
+			$this->_socket = null;
+		}
 	}
 
 	private function _response()
@@ -120,6 +120,6 @@ class _default implements connection
 
 	public function __destruct()
 	{
-		$this->close();
+		$this->_close();
 	}
 }

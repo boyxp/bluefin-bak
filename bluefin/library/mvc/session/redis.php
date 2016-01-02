@@ -1,7 +1,7 @@
 <?php
 namespace library\mvc\session;
 use library\mvc\session;
-use library\redis;
+use library\orm\connection\redis as connection;
 class redis implements session
 {
 	private $_life   = 1200;
@@ -13,7 +13,7 @@ class redis implements session
 	private $_prefix = 'SESSION:';
 	private $_cache  = null;
 
-	public function __construct(redis $redis)
+	public function __construct(connection $redis)
 	{
 		$this->_redis  = $redis;
 		$this->_secure = isset($_SERVER['HTTPS']);
@@ -36,20 +36,16 @@ class redis implements session
 
 	public function read($session_id)
 	{
-		$this->_redis->connect();
 		$this->_cache = $this->_redis->get($this->_prefix.$session_id);
 		$this->_redis->expire($this->_prefix.$session_id, $this->_life);
-		$this->_redis->close();
 		return $this->_cache===null ? '' : $this->_cache;
 	}
 
 	public function write($session_id, $session_data)
 	{
 		if($session_data and $this->_cache!==$session_data) {
-			$this->_redis->connect();
 			$this->_redis->set($this->_prefix.$session_id, $session_data);
 			$this->_cache = $session_data;
-			$this->_redis->close();
 		}
 
 		return true;
