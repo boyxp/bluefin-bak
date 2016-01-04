@@ -142,4 +142,11 @@ $classmap
 		'openssl' => 'library\crypto\crypt\openssl',
 	),
 ))
+->set('cache', array(
+	'interface' => 'library\nosql\cache',
+	'impls'     => array(
+		'default' => 'library\nosql\cache\redis',
+		'redis'   => 'library\nosql\cache\redis',
+	),
+))
 ;
