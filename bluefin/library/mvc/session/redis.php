@@ -16,7 +16,7 @@ class redis implements session
 	public function __construct(connection $redis)
 	{
 		$this->_redis  = $redis;
-		$this->_secure = isset($_SERVER['HTTPS']);
+		$this->_secure = (isset($_SERVER['HTTPS']) and isset($_SERVER['HTTP_X_FORWARDED_PORT']) and $_SERVER['HTTP_X_FORWARDED_PORT']==='443');
 		$this->_domain = $_SERVER['SERVER_NAME'];
 		$this->_prefix = "SESSION:{$_SERVER['SERVER_NAME']}:";
 		session_set_save_handler($this, true);
