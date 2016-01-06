@@ -3,6 +3,10 @@ namespace component\dispatcher;
 use component\dispatcher;
 class _default implements dispatcher
 {
+	private $_aborted   = false;
+	private $_forwarded = false;
+	private $_contents  = null;
+
 	/**
 	* dispatch
 	*
@@ -18,6 +22,30 @@ class _default implements dispatcher
 			$handle[0] = new $handle[0];
 		}
 
+		if($this->_forwarded) {
+			return $this->_contents;
+		}
+
+		if($this->_aborted) {
+			return;
+		}
+
 		return call_user_func_array($handle, $params);
+	}
+
+	public function abort()
+	{
+		$this->_aborted = true;
+	}
+
+	public function forward($handle, array $params=array())
+	{
+		if($this->_forwarded) {
+			return;
+		}
+
+		$this->_contents  = $this->dispatch($handle, $params);
+		$this->_forwarded = true;
+		return $this->_contents;
 	}
 }
