@@ -3,9 +3,10 @@ namespace component\dispatcher;
 use component\dispatcher;
 class _default implements dispatcher
 {
-	private $_aborted   = false;
-	private $_forwarded = false;
-	private $_contents  = null;
+	private $_aborted    = false;
+	private $_forwarding = false;
+	private $_forwarded  = false;
+	private $_contents   = null;
 
 	/**
 	* dispatch
@@ -18,7 +19,7 @@ class _default implements dispatcher
 	*/
 	public function dispatch($handle, array $params=array())
 	{
-		if(is_array($handle) and is_string($handle[0])) {
+		if(is_array($handle) and is_string($handle[0]) and !$this->_forwarded and !$this->_aborted) {
 			$handle[0] = new $handle[0];
 		}
 
@@ -30,7 +31,13 @@ class _default implements dispatcher
 			return;
 		}
 
-		return call_user_func_array($handle, $params);
+		$result = call_user_func_array($handle, $params);
+
+		if($this->_forwarding) {
+			$this->_forwarded = true;
+		}
+
+		return $result;
 	}
 
 	public function abort()
@@ -40,12 +47,12 @@ class _default implements dispatcher
 
 	public function forward($handle, array $params=array())
 	{
-		if($this->_forwarded) {
-			return;
+		if($this->_forwarded or $this->_forwarding) {
+			return $this->_contents;
 		}
 
-		$this->_contents  = $this->dispatch($handle, $params);
-		$this->_forwarded = true;
+		$this->_forwarding = true;
+		$this->_contents   = $this->dispatch($handle, $params);
 		return $this->_contents;
 	}
 }
