@@ -44,7 +44,8 @@ class redis implements cache
 
 	public function ttl($key)
 	{
-		return $this->_redis->ttl($key);
+		$ttl = $this->_redis->ttl($key);
+		return $ttl>0 ? $ttl : 0;
 	}
 
 	public function exists($key)
