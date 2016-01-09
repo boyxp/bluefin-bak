@@ -281,7 +281,6 @@ class mongo implements query,injector
 		if($this->type!==static::INSERT) {
 			$tree     = $this->_parse($this->condition);
 			$criteria = $this->_bind($tree, $this->bind);
-
 			$cursor   = $collection->find($criteria, array('_id'));
 			$cursor   = count($this->order)>0 ? $cursor->sort($this->order) : $cursor;
 			$cursor   = $cursor->limit($this->count);
@@ -350,10 +349,6 @@ class mongo implements query,injector
 					if(!ctype_alnum($condition)) {
 						break;
 					}
-
-					if(strlen($condition)===24) {
-						$condition = new \MongoId($condition);
-					}
 			case 'integer':
 					$bind      = array($condition);
 					$condition = '_id=?';
@@ -373,6 +368,20 @@ class mongo implements query,injector
 	protected function _bind(array &$tree, array &$bind=null)
 	{
 		foreach($tree as $key=>$conds) {
+			if($key==='_id') {
+				$value = array_shift($bind);
+				if(is_string($value) and strlen($value)===24) {
+					$value = new \MongoId($value);
+				} elseif(is_array($value)) {
+					foreach($value as $index=>$id) {
+						if(is_string($id) and strlen($id)===24) {
+							$value[$index] = new \MongoId($id);
+						}
+					}
+				}
+				array_unshift($bind, $value);
+			}
+
 			if(is_array($conds)) {
 				$tree[$key] = $this->{__FUNCTION__}($conds, $bind);
 			} elseif($conds==='?') {
