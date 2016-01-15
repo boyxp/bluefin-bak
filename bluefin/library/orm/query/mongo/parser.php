@@ -13,7 +13,7 @@ class parser
 		static::$_tokens = $tokens;
 
 		$tree = static::_tree();
-		if(!isset($tree['conds'][0])) { throw new \exception('syntax error'); }
+		if(!isset($tree['conds'][0])) { throw new \InvalidArgumentException('syntax error'); }
 		return count(current($tree['conds'][0]))===1 ? current(current($tree['conds'][0])) : $tree['conds'][0];
 	}
 
@@ -96,7 +96,7 @@ class parser
 							$oprts = '$exists';
 						break;
 						default :
-							throw new \exception('syntax error');
+							throw new \InvalidArgumentException('syntax error');
 						break;
 					}
 				break;
@@ -108,7 +108,7 @@ class parser
 							$value = $token;
 						break;
 						default :
-							throw new \exception('syntax error');
+							throw new \InvalidArgumentException('syntax error');
 						break;
 					}
 					$conds[] = $oprts==='$eq' ? array($key=>$value) : array($key=>array($oprts=>$value));
@@ -127,12 +127,12 @@ class parser
 							$state   = -1;
 						break;
 						default :
-							throw new \exception('syntax error');
+							throw new \InvalidArgumentException('syntax error');
 						break;
 					}
 				break;
 				default :
-					throw new \exception('syntax error');
+					throw new \InvalidArgumentException('syntax error');
 				break;
 			}
 			$state++;

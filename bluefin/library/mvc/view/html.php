@@ -10,7 +10,7 @@ class html implements view
 		if(is_file($template)) {
 			$this->_template = $template;
 		} else {
-			throw new \exception("Template {$template} not found");
+			throw new \InvalidArgumentException("Template {$template} not found");
 		}
 	}
 

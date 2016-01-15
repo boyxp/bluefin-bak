@@ -26,7 +26,7 @@ class mongo extends \MongoDB implements connection
 
 			parent::__construct(static::$_connection[$dsn], $options['db']);
 		} catch (exception $e) {
-			throw new \exception('Connection failed: '.$e->getMessage(), $e->getCode());
+			throw new \InvalidArgumentException('Connection failed: '.$e->getMessage(), $e->getCode());
 		}
 	}
 

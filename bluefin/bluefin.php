@@ -15,7 +15,7 @@ spl_autoload_register(function($class) use(&$locator) {
 if(isset($locator)) {
 	$impls = class_implements($locator, false);
 	if(!isset($impls['component\locator'])) {
-		throw new exception('$locator must implement interface \component\locator');
+		throw new LogicException('$locator must implement interface component\locator');
 	}
 	unset($impls);
 } else {

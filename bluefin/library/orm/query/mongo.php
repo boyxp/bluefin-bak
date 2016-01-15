@@ -38,7 +38,7 @@ class mongo implements query,injector
 
 	public function insert(array $data)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type = static::INSERT;
 		$this->data = $data;
@@ -48,7 +48,7 @@ class mongo implements query,injector
 
 	public function update(array $data)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type = static::UPDATE;
 
@@ -68,7 +68,7 @@ class mongo implements query,injector
 
 	public function delete(array $data=null)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type = static::DELETE;
 
@@ -82,7 +82,7 @@ class mongo implements query,injector
 
 	public function select($columns=null)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error', 2001); }
+		if($this->state >= 1) { throw new \LogicException('syntax error', 2001); }
 
 		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
 			$aggregate = array();
@@ -116,7 +116,7 @@ class mongo implements query,injector
 
 	public function from()
 	{
-		if($this->state >= 2) { throw new \exception('syntax error'); }
+		if($this->state >= 2) { throw new \LogicException('syntax error'); }
 
 		$this->state = 2;
 		return $this;
@@ -124,7 +124,7 @@ class mongo implements query,injector
 
 	public function where($condition, array $bind=null)
 	{
-		if($this->state >= 3) { throw new \exception('syntax error'); }
+		if($this->state >= 3) { throw new \LogicException('syntax error'); }
 
 		$bind  = is_null($bind) ? array() : $bind;
 		$where = static::_condition($condition, $bind);
@@ -137,7 +137,7 @@ class mongo implements query,injector
 	public function group($fields)
 	{
 		if($this->record or $this->state >= 4) {
-			throw new \exception('syntax error');
+			throw new \LogicException('syntax error');
 		}
 
 		$group  = array();
@@ -153,7 +153,7 @@ class mongo implements query,injector
 
 	public function having($condition, array $bind=null)
 	{
-		if($this->state != 4) { throw new \exception('syntax error'); }
+		if($this->state != 4) { throw new \LogicException('syntax error'); }
 
 		$where = static::_condition($condition, $bind);
 		$this->having = $where['condition'];
@@ -164,7 +164,7 @@ class mongo implements query,injector
 
 	public function order($field, $direction='ASC')
 	{
-		if($this->state > 6) { throw new \exception('syntax error'); }
+		if($this->state > 6) { throw new \LogicException('syntax error'); }
 
 		$this->order[$field] = strtolower($direction)==='asc' ? 1 : -1;
 		$this->state         = 6;
@@ -173,7 +173,7 @@ class mongo implements query,injector
 
 	public function limit($offset=20, $count=null)
 	{
-		if($this->state >= 7) { throw new \exception('syntax error'); }
+		if($this->state >= 7) { throw new \LogicException('syntax error'); }
 
 		if(is_null($count)) {
 			$this->offset = 0;
@@ -358,7 +358,7 @@ class mongo implements query,injector
 					$condition = '_id IN(?)';
 					break;
 			default      :
-					throw new \exception('syntax error');
+					throw new \LogicException('syntax error');
 			break;
 		}
 
@@ -386,7 +386,7 @@ class mongo implements query,injector
 				$tree[$key] = $this->{__FUNCTION__}($conds, $bind);
 			} elseif($conds==='?') {
 				$value = array_shift($bind);
-				if($value===null) { throw new \exception('SQL parameter is missing'); }
+				if($value===null) { throw new \InvalidArgumentException('SQL parameter is missing'); }
 				if($key==='$like') {
 					unset($tree[$key]);
 					$head   = substr($value, 0, 1);
@@ -400,7 +400,7 @@ class mongo implements query,injector
 					$key    = '$regex';
 				} elseif($key==='$near') {
 					if(!is_array($value) and count($value)>1) {
-						throw new \exception('syntax error');
+						throw new \LogicException('syntax error');
 					}
 
 					$longitude = floatval(array_shift($value));
@@ -418,7 +418,7 @@ class mongo implements query,injector
 			} elseif($key==='$exists') {
 				continue;
 			} else {
-				throw new \exception('syntax error');
+				throw new \LogicException('syntax error');
 			}
 		}
 

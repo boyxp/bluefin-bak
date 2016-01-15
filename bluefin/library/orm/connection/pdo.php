@@ -16,7 +16,7 @@ class pdo extends \PDO implements connection
 		try {
 			parent::__construct($dsn, $user, $password, array(\PDO::ATTR_PERSISTENT => true));
 		} catch (exception $e) {
-			throw new \exception('Connection failed: '.$e->getMessage(), $e->getCode());
+			throw new \InvalidArgumentException('Connection failed: '.$e->getMessage(), $e->getCode());
 		}
 
 		$this->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

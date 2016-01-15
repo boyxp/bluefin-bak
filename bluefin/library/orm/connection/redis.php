@@ -20,7 +20,7 @@ class redis implements connection
 		if(!$this->_socket) {
 			$socket = @fsockopen($this->_host, $this->_port, $errno, $error, 5);
 			if(!$socket) {
-				throw new \Exception("Can't connect to Redis server on '{$this->_host}:{$this->_port}'");
+				throw new \InvalidArgumentException("Can't connect to Redis server on '{$this->_host}:{$this->_port}'");
 			}
 
 			$this->_socket = $socket;
@@ -74,7 +74,7 @@ class redis implements connection
 
 		switch($type) {
 			case '-' :
-				throw new \Exception($data);
+				throw new \UnexpectedValueException($data);
 			case '+' :
 				return $data;
 			case ':' :
@@ -91,7 +91,7 @@ class redis implements connection
 				}
 
 				$end = fread($this->_socket, 2);
-				if($end != "\r\n") { throw new \Exception("Unknown response end: {$end}"); }
+				if($end != "\r\n") { throw new \UnexpectedValueException("Unknown response end: {$end}"); }
 
 				return $res;
 			case '*' :
@@ -101,7 +101,7 @@ class redis implements connection
 				}
 				return $res;
 			default :
-				throw new \Exception("Unknown response: {$data}");
+				throw new \UnexpectedValueException("Unknown response: {$data}");
 		}
 	}
 

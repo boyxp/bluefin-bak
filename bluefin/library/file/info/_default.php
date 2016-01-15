@@ -8,7 +8,7 @@ class _default implements info
 	public function __construct($file)
 	{
 		if(!is_file($file)) {
-			throw new \exception("The file {$file} does not exist");
+			throw new \InvalidArgumentException("The file {$file} does not exist");
 		}
 
 		$this->_file = $file;

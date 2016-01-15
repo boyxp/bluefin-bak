@@ -11,7 +11,7 @@ class file implements reader
 		if(is_file($file) and is_readable($file)) {
 			$this->handle = fopen($file, 'r');
 		} else {
-			throw new exception('The file is not readable');
+			throw new \InvalidArgumentException('The file is not readable');
 		}
 	}
 

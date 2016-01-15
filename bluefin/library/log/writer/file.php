@@ -13,7 +13,7 @@ class file implements writer
 		} elseif(is_dir(dirname($file)) and is_writable(dirname($file))) {
 			$this->handle = fopen($file, ($mode ? $mode : 'w'));
 		} else {
-			throw new exception('The file is not writable');
+			throw new \InvalidArgumentException('The file is not writable');
 		}
 	}
 

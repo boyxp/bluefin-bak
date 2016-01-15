@@ -7,7 +7,7 @@ class tokenizer
 		$tokens = static::_scan($condition);
 		$tokens = array_filter($tokens, array(__CLASS__, '_filter'));
 		$tokens = array_values($tokens);
-		if(!isset($tokens[4])) { throw new \exception('syntax error'); }
+		if(!isset($tokens[4])) { throw new \InvalidArgumentException('syntax error'); }
 		return $tokens;
 	}
 

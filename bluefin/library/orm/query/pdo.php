@@ -38,7 +38,7 @@ class pdo implements query,injector
 
 	public function insert(array $data)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type   = static::INSERT;
 		$this->fields = array_keys($data);
@@ -49,7 +49,7 @@ class pdo implements query,injector
 
 	public function update(array $data)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type = static::UPDATE;
 
@@ -72,7 +72,7 @@ class pdo implements query,injector
 
 	public function delete(array $data=null)
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		$this->type = static::DELETE;
 
@@ -86,7 +86,7 @@ class pdo implements query,injector
 
 	public function select($columns='*')
 	{
-		if($this->state >= 1) { throw new \exception('syntax error'); }
+		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		if(strpos($columns, '(')!==false and preg_match('/\s(?:avg|count|max|min|sum)\s*\(/i', ' '.$columns)) {
 			$this->record  = false;
@@ -103,7 +103,7 @@ class pdo implements query,injector
 
 	public function from()
 	{
-		if($this->state >= 2) { throw new \exception('syntax error'); }
+		if($this->state >= 2) { throw new \LogicException('syntax error'); }
 
 		$this->state = 2;
 		return $this;
@@ -111,7 +111,7 @@ class pdo implements query,injector
 
 	public function where($condition, array $bind=null)
 	{
-		if($this->state >= 3) { throw new \exception('syntax error'); }
+		if($this->state >= 3) { throw new \LogicException('syntax error'); }
 
 		$bind  = is_null($bind) ? array() : $bind;
 		$where = static::_condition($condition, $bind);
@@ -124,7 +124,7 @@ class pdo implements query,injector
 	public function group($fields)
 	{
 		if($this->record or $this->state >= 4) {
-			throw new \exception('syntax error');
+			throw new \LogicException('syntax error');
 		}
 
 		$this->group = "GROUP BY {$fields}";
@@ -134,7 +134,7 @@ class pdo implements query,injector
 
 	public function having($condition, array $bind=null)
 	{
-		if($this->state != 4) { throw new \exception('syntax error'); }
+		if($this->state != 4) { throw new \LogicException('syntax error'); }
 
 		$this->bind   = is_null($bind) ? $this->bind : array_merge($this->bind, $bind);
 		$this->having = "HAVING {$condition}";
@@ -144,7 +144,7 @@ class pdo implements query,injector
 
 	public function order($field, $direction='ASC')
 	{
-		if($this->state > 6) { throw new \exception('syntax error'); }
+		if($this->state > 6) { throw new \LogicException('syntax error'); }
 
 		$this->order[] = $field.' '.$direction;
 		$this->state   = 6;
@@ -153,7 +153,7 @@ class pdo implements query,injector
 
 	public function limit($offset=20, $count=null)
 	{
-		if($this->state >= 7) { throw new \exception('syntax error'); }
+		if($this->state >= 7) { throw new \LogicException('syntax error'); }
 
 		if(is_null($count)) {
 			$this->offset = 0;
@@ -285,7 +285,7 @@ class pdo implements query,injector
 					$condition = $this->key.' IN(?'.str_repeat(',?', count($bind)-1).')';
 					break;
 			default      :
-					throw new \exception('syntax error');
+					throw new \LogicException('syntax error');
 			break;
 		}
 

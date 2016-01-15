@@ -10,11 +10,11 @@ class openssl implements signature
 	public function __construct($private_key, $public_key, $base64=true)
 	{
 		if(!is_file($private_key)) {
-			throw new \exception('private key not found');
+			throw new \InvalidArgumentException('private key not found');
 		}
 
 		if(!is_file($public_key)) {
-			throw new \exception('public key not found');
+			throw new \InvalidArgumentException('public key not found');
 		}
 
 		$this->_private_key = $private_key;

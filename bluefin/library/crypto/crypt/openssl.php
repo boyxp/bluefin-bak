@@ -12,7 +12,7 @@ class openssl implements crypt
 		if($method) {
 			$methods = openssl_get_cipher_methods(true);
 			if(!in_array($method, $methods)) {
-				throw new \exception('Unknown cipher algorithm');
+				throw new \LogicException('Unknown cipher algorithm');
 			}
 			$this->_method = $method;
 		}
