@@ -142,6 +142,13 @@ $classmap
 		'openssl' => 'library\crypto\crypt\openssl',
 	),
 ))
+->set('signature', array(
+	'interface' => 'library\crypto\signature',
+	'impls'     => array(
+		'default' => 'library\crypto\signature\openssl',
+		'openssl' => 'library\crypto\signature\openssl',
+	),
+))
 ->set('cache', array(
 	'interface' => 'library\nosql\cache',
 	'impls'     => array(
