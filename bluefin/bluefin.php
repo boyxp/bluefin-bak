@@ -12,20 +12,11 @@ spl_autoload_register(function($class) use(&$locator) {
 }, true, true);
 
 //locator
-if(isset($locator)) {
-	$impls = class_implements($locator, false);
-	if(!isset($impls['component\locator'])) {
-		throw new LogicException('$locator must implement interface component\locator');
-	}
-	unset($impls);
-} else {
-	$classmap = new component\registry\apc('classmap');
-	$version  = filemtime(__DIR__.'/classmap.php');
-	if($classmap->version != $version) {
-		include(__DIR__.'/classmap.php');
-		$classmap->version = $version;
-	}
-
-	$locator = new component\locator\_default($classmap);
-	unset($version, $classmap);
+$classmap = new component\registry\apc('classmap');
+$version  = filemtime(__DIR__.'/classmap.php');
+if($classmap->version != $version) {
+	include(__DIR__.'/classmap.php');
+	$classmap->version = $version;
 }
+
+return $locator = new component\locator\_default($classmap);
