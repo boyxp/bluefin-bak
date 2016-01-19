@@ -3,30 +3,43 @@ namespace component\loader;
 use component\loader;
 class psr
 {
-	private static $_registered = false;
+	private static $_registered  = false;
+	private static $_include_dir = array();
+
+	public function __construct()
+	{
+		static::$_include_dir = explode(PATH_SEPARATOR, get_include_path());
+	}
 
 	public function add($dir, $prepend=false)
 	{
-		$path = get_include_path();
-		if(strpos($path.PATH_SEPARATOR, $dir.PATH_SEPARATOR)===false) {
+		if(in_array($dir, static::$_include_dir)===false) {
 			if($prepend) {
-				set_include_path($dir.PATH_SEPARATOR.get_include_path());
+				array_unshift(static::$_include_dir, $dir);
 			} else {
-				set_include_path(get_include_path().PATH_SEPARATOR.$dir);
+				static::$_include_dir[] = $dir;
 			}
 		}
 	}
 
 	public function load($class)
 	{
-		include(strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
-		return true;
+		$file = DIRECTORY_SEPARATOR.strtr($class, '\\', DIRECTORY_SEPARATOR).'.php';
+
+		foreach(static::$_include_dir as $dir) {
+			if(is_file($dir.$file)) {
+				include($dir.$file);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public function register($prepend=false)
 	{
 		if(!static::$_registered) {
-			spl_autoload_register(array(__CLASS__, 'load'), true, $prepend);
+			spl_autoload_register(array($this, 'load'), true, $prepend);
 			static::$_registered = true;
 		}
 	}
@@ -34,7 +47,7 @@ class psr
 	public function unregister()
 	{
 		if(static::$_registered) {
-			spl_autoload_unregister(array(__CLASS__, 'load'));
+			spl_autoload_unregister(array($this, 'load'));
 		}
 	}
 }
