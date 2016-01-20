@@ -1,19 +1,16 @@
 <?php
 namespace component\router;
 use component\router;
-use component\injector;
-use component\locator;
 use component\registry;
-class _default implements router,injector
+class _default implements router
 {
 	private $_registry = null;
 	private $_handle   = null;
 	private $_matches  = array();
-	private static $_locator = null;
 
-	public function __construct(registry $registry=null)
+	public function __construct(registry $registry)
 	{
-		$this->_registry = $registry ? $registry : static::$_locator->get('registry', array('rules'));
+		$this->_registry = $registry;
 	}
 
 	public function addRule($pattern, $handle)
@@ -53,17 +50,8 @@ class _default implements router,injector
 		return $this;
 	}
 
-	public function route($subject=null)
+	public function route($subject)
 	{
-		if($subject===null) {
-			$request = static::$_locator->request;
-			if(($pos=strrpos($request->uri, '.'))!==false) {
-				$subject = $request->method.':'.substr($request->uri, 0, $pos);
-			} else {
-				$subject = $request->method.':'.$request->uri;
-			}
-		}
-
 		if($handle=$this->_registry->get("STATIC:{$subject}")) {
 			$this->_handle = $handle;
 			return true;
@@ -103,10 +91,5 @@ class _default implements router,injector
 	public function getMatches()
 	{
 		return $this->_matches;
-	}
-
-	public static function inject(locator $locator)
-	{
-		static::$_locator = $locator;
 	}
 }
