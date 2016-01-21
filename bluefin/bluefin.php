@@ -1,15 +1,9 @@
 <?php
 //loader
-set_include_path(__DIR__.PATH_SEPARATOR.get_include_path());
-spl_autoload_register(function($class) use(&$locator) {
-	include(strtr($class, '\\', DIRECTORY_SEPARATOR).'.php');
-	$impls = class_implements($class, false);
-	if(isset($impls['component\injector'])) {
-		call_user_func(array($class, 'inject'), $locator);
-	}
-	unset($impls);
-	return true;
-}, true, true);
+include('component/loader/psr.php');
+$loader = new component\loader\psr;
+$loader->add(__DIR__, true);
+$loader->register(true);
 
 //locator
 $classmap = new component\registry\apc('classmap');
@@ -18,5 +12,10 @@ if($classmap->version != $version) {
 	include(__DIR__.'/classmap.php');
 	$classmap->version = $version;
 }
+$locator = new component\locator\_default($classmap);
 
-return $locator = new component\locator\_default($classmap);
+//injector
+class_alias('component\injector\_default', 'injector');
+injector::inject($locator);
+
+return $locator;
