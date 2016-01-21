@@ -2,15 +2,12 @@
 namespace library\orm\pool;
 use library\orm\connection;
 use library\orm\pool;
-use component\injector;
-use component\locator;
 use component\registry;
-class _default implements pool,injector
+class _default extends \injector implements pool
 {
 	private static $_registry   = null;
 	private static $_connection = array();
 	private static $_singleton  = array();
-	private static $_locator    = null;
 
 	public function __construct(registry $registry=null)
 	{
@@ -88,11 +85,6 @@ class _default implements pool,injector
 	public function __set($db, connection $connection)
 	{
 		$this->addConnection($db, $connection);
-	}
-
-	public static function inject(locator $locator)
-	{
-		static::$_locator = $locator;
 	}
 
 	public function __destruct()

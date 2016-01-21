@@ -1,9 +1,7 @@
 <?php
 namespace library\orm\query;
 use library\orm\query;
-use component\injector;
-use component\locator;
-class pdo implements query,injector
+class pdo extends \injector implements query
 {
 	private $database  = null;
 	private $table     = null;
@@ -26,8 +24,6 @@ class pdo implements query,injector
 	const SELECT = 'SELECT';
 	const UPDATE = 'UPDATE';
 	const DELETE = 'DELETE';
-
-	private static $_locator = null;
 
 	public function __construct($database, $table, $key)
 	{
@@ -245,11 +241,6 @@ class pdo implements query,injector
 		}
 
 		return $query;
-	}
-
-	public static function inject(locator $locator)
-	{
-		static::$_locator = $locator;
 	}
 
 	protected function _condition($condition, array $bind=null)

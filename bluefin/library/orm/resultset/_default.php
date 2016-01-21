@@ -1,16 +1,12 @@
 <?php
 namespace library\orm\resultset;
 use library\orm\resultset;
-use component\injector;
-use component\locator;
-class _default implements resultset,injector
+class _default extends \injector implements resultset
 {
 	private $_query   = null;
 	private $_data    = null;
 	private $_positon = 0;
 	private $_record  = array();
-
-	private static $_locator = null;
 
 	public function __construct(array $data=array(), $query=null)
 	{
@@ -157,10 +153,5 @@ class _default implements resultset,injector
 		}
 
 		return $this->_record[$offset];
-	}
-
-	public static function inject(locator $locator)
-	{
-		static::$_locator = $locator;
 	}
 }
