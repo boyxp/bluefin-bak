@@ -13,7 +13,7 @@ class tokenizer
 
 	private static function _scan($condition)
 	{
-		$condition = preg_replace('/\s*([=!><]+|\(|\)|and|or)\s*/i', ' $1 ', '('.$condition.')');
+		$condition = preg_replace('/\s*([=!><]+|\(|\)|\sand\s|\sor\s)\s*/i', ' $1 ', '('.$condition.')');
 		$condition = preg_replace('/\sin\s*\(\s*\?\s*\)/i', ' in ?', $condition);
 		//$condition = preg_replace('/\s(in|against)\s*\(\s*\?\s*\)/i', ' $1 ?', $condition);
 		//$condition = preg_replace('/\smatch\s*\(\s*([a-z0-9_]+)\s*\)/i', ' $1', $condition);
