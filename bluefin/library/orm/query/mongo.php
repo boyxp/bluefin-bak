@@ -80,7 +80,7 @@ class mongo extends \injector implements query
 	{
 		if($this->state >= 1) { throw new \LogicException('syntax error', 2001); }
 
-		if(strpos($columns, '(')!==false and preg_match_all('/,?\s*(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', ' '.$columns, $matches)) {
+		if(strpos($columns, '(')!==false and preg_match_all('/(?:,|^|\s)(avg|count|max|min|sum)\s*\(([^\(\)]+)\)\s*(?:as\s+([a-z0-9_]+))?/i', $columns, $matches)) {
 			$aggregate = array();
 			foreach($matches[1] as $key=>$function) {
 				$field = $matches[2][$key];

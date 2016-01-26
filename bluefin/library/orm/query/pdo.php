@@ -84,7 +84,7 @@ class pdo extends \injector implements query
 	{
 		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
-		if(strpos($columns, '(')!==false and preg_match('/(,|^|\s)(?:avg|count|max|min|sum)\s*\(/i', $columns)) {
+		if(strpos($columns, '(')!==false and preg_match('/(?:,|^|\s)(?:avg|count|max|min|sum)\s*\(/i', $columns)) {
 			$this->record  = false;
 			$this->columns = $columns;
 		} else {
