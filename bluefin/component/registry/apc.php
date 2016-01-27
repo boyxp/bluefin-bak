@@ -19,7 +19,7 @@ class apc implements registry
 
 	public function get($key)
 	{
-		return \apc_fetch($this->_prefix.$key);
+		return \apcu_fetch($this->_prefix.$key);
 	}
 
 	public function __get($key)
@@ -33,7 +33,7 @@ class apc implements registry
 
 	public function set($key, $value, $ttl=0)
 	{
-		\apc_store($this->_prefix.$key, $value, $ttl);
+		\apcu_store($this->_prefix.$key, $value, $ttl);
 		return $this;
 	}
 
@@ -45,7 +45,7 @@ class apc implements registry
 
 	public function exists($key)
 	{
-		return \apc_exists($this->_prefix.$key); 
+		return \apcu_exists($this->_prefix.$key); 
 	}
 
 	public function delete($key)
@@ -54,17 +54,17 @@ class apc implements registry
 			unset($this->_cache[$key]);
 		}
 
-		return \apc_delete($this->_prefix.$key);
+		return \apcu_delete($this->_prefix.$key);
 	}
 
 	public function flush()
 	{
 		$this->_cache = array();
 
-		$iterator = new \APCIterator('user');
+		$iterator = class_exists('\APCUIterator') ? new \APCUIterator() : new \APCIterator('user');
 		foreach($iterator as $key=>$value) {
 			if($this->_prefix==='' or strpos($key, $this->_prefix)===0) {
-				\apc_delete($key);
+				\apcu_delete($key);
 			}
 		}
 		$iterator = null;
