@@ -7,7 +7,7 @@ interface locator
 	public function __set($service, $instance);
 	public function set($service, $instance);
 
-	public function make($service, array $params=null);
+	public function make($service, array $args=null);
 	public function bind($service, array $args);
 	public function alias($service, $alias);
 
