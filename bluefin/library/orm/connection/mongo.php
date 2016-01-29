@@ -5,7 +5,7 @@ class mongo extends \MongoDB implements connection
 {
 	protected static $_connection = array();
 
-	public function __construct($dsn, $user='', $password='', array $options=null)
+	public function __construct($dsn, array $options=null)
 	{
 		$options = $options===null ? array('connect'=>true) : $options;
 		if($user) {
