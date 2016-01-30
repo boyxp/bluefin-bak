@@ -1,6 +1,10 @@
 <?php
 namespace library\orm\query;
 use library\orm\query;
+use MongoDB\Driver\Command;
+use MongoDB\BSON\ObjectID;
+use MongoDB\Driver\Query as MongoQuery;
+use MongoDB\Driver\BulkWrite;
 class mongodb extends \injector implements query
 {
 	private $database  = null;
@@ -37,7 +41,7 @@ class mongodb extends \injector implements query
 		if($this->state >= 1) { throw new \LogicException('syntax error'); }
 
 		if(!isset($data['_id'])) {
-			$data['_id'] = new \MongoDB\BSON\ObjectID;
+			$data['_id'] = new ObjectID;
 		}
 
 		$this->type = static::INSERT;
@@ -222,7 +226,7 @@ class mongodb extends \injector implements query
 			$options['skip']  = $this->offset;
 			$options['limit'] = $this->count;
 			$options['sort']  = $this->order;
-			$query  = new \MongoDB\Driver\Query($where, $options);
+			$query  = new MongoQuery($where, $options);
 			$cursor = $manager->executeQuery($collection, $query)->toArray();
 
 			foreach($cursor as $row) {
@@ -252,7 +256,7 @@ class mongodb extends \injector implements query
 			$ops[] = array('$skip' =>$this->offset);
 			$ops[] = array('$limit'=>$this->count);
 
-			$command = new \MongoDB\Driver\Command(array(
+			$command = new Command(array(
 				'aggregate' => $this->table,
 				'pipeline'  => $ops,
 				'cursor'    => new \stdClass,
@@ -294,17 +298,18 @@ class mongodb extends \injector implements query
 		$manager    = $connection->getManager();
 		$database   = $connection->getDatabase();
 		$collection = $database.'.'.$this->table;
-		$bulk       = new \MongoDB\Driver\BulkWrite();
+		$bulk       = new BulkWrite();
 
 		if($this->type!==static::INSERT) {
 			$tree     = $this->_parse($this->condition);
 			$criteria = $this->_bind($tree, $this->bind);
-			$query    = new \MongoDB\Driver\Query($criteria, array(
+			$query    = new MongoQuery($criteria, array(
 						'projection' => array('_id'=>1),
-						'skip'=>0,
-						'limit'=>$this->count,
+						'skip'       => 0,
+						'limit'      => $this->count,
 			));
-			$cursor = $manager->executeQuery($collection, $query)->toArray();
+			$cursor   = $manager->executeQuery($collection, $query)->toArray();
+
 			if(count($cursor)>0) {
 				$keys = array();
 				foreach($cursor as $row) {
@@ -331,7 +336,8 @@ class mongodb extends \injector implements query
 					$bulk->delete($criteria, array('limit'=>0));
 					$result = $manager->executeBulkWrite($collection, $bulk)->getDeletedCount();
 					break;
-			default             : $result = null;
+			default             :
+					$result = null;
 		}
 
 		$this->_reset();
@@ -388,11 +394,11 @@ class mongodb extends \injector implements query
 			if($key==='_id') {
 				$value = array_shift($bind);
 				if(is_string($value) and strlen($value)===24) {
-					$value = new \MongoDB\BSON\ObjectID($value);
+					$value = new ObjectID($value);
 				} elseif(is_array($value)) {
 					foreach($value as $index=>$id) {
 						if(is_string($id) and strlen($id)===24) {
-							$value[$index] = new \MongoDB\BSON\ObjectID($id);
+							$value[$index] = new ObjectID($id);
 						}
 					}
 				}
