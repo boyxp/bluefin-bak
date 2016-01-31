@@ -448,19 +448,38 @@ class mongodb extends \injector implements query
 		return $tree;
 	}
 
-	private function _stdToArray($array)
+	private function _stdToArray($result)
 	{
-		if(is_object($array)) {
-			$array = (array)$array;
-		}
-
-		if(is_array($array)) {
-			foreach($array as $key=>$value) {
-				$array[$key] = $this->{__FUNCTION__}($value);
+		$array = array();
+		foreach($result as $key=>$value) {
+			if(is_object($value)) {
+				switch(get_class($value)) {
+					case 'MongoDB\BSON\ObjectID'   :
+									$value = strval($value);
+									break;
+					case 'stdClass'                :
+									$value = $this->{__FUNCTION__}($value);
+									break;
+					case 'MongoDB\BSON\Timestamp'  :
+									$time  = strval($value);
+									$value = intval(substr($time, strpos($time, ':')+1, -1));
+									break;
+					case 'MongoDB\BSON\UTCDateTime':
+									$value = strval($value);
+									break;
+					case 'MongoDB\BSON\Regex'      :
+									$value = strval($value);
+									break;
+					case 'MongoDB\BSON\Binary'     :
+									$value = $value->getData();
+									break;
+				}
 			}
+
+			$array[$key] = $value;
 		}
 
-		return $array;  
+		return $array;
 	}
 
 	private function _reset()
