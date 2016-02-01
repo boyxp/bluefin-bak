@@ -46,6 +46,7 @@ $classmap
 		'default' => 'library\orm\connection\pdo',
 		'pdo'     => 'library\orm\connection\pdo',
 		'mongo'   => 'library\orm\connection\mongo',
+		'mongodb' => 'library\orm\connection\mongodb',
 		'redis'   => 'library\orm\connection\redis',
 	),
 ))
@@ -67,6 +68,7 @@ $classmap
 		'default' => 'library\orm\query\pdo',
 		'pdo'     => 'library\orm\query\pdo',
 		'mongo'   => 'library\orm\query\mongo',
+		'mongodb' => 'library\orm\query\mongodb',
 	),
 ))
 ->set('table', array(
